@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>Modal Compass Pro - Smartboard Optimized</title>
-<!-- Google AdSense -->
+<title>Modal Compass Pro - Geoptimaliseerd voor Smartboards</title>
+<!-- Google AdSense Hoofdscript -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5641232243273162" crossorigin="anonymous"></script>
-<!-- External library for PNG export -->
+<!-- Externe bibliotheek voor PNG export -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root {
@@ -19,7 +19,7 @@
     --dim: rgba(233, 237, 245, 0.15);
     --card-bg: rgba(17, 24, 39, 0.85);
     --ad-width: 160px;
-    --panel-width: 280px; /* Symmetrical width for both panels */
+    --panel-width: 280px; 
     --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -35,25 +35,23 @@
     background: #ffffff !important;
   }
 
-  /* SVG Overrides for Themes */
+  /* SVG Overschrijvingen voor Thema's */
   body.light-theme .main-bg-circle { fill: #ffffff !important; stroke: #000000 !important; stroke-width: 1px; }
   body.light-theme .ring-circle { fill: #ffffff !important; stroke: #000000 !important; }
   body.light-theme .inner-circle { fill: #ffffff !important; stroke: #000000 !important; }
   body.light-theme .center-dot { fill: #000000 !important; filter: none !important; }
-  
-  /* Arrow paths: stroke-width must be overridable by .selected */
   body.light-theme .arrow-path { fill: rgba(0,0,0,0.03) !important; stroke: #000000 !important; stroke-width: 1.5px; }
-  
   body.light-theme .tick-dot { fill: #000000 !important; }
   body.light-theme .roman-text, body.light-theme .chord-text { fill: #000000 !important; filter: none !important; }
   body.light-theme .note-part.active, body.light-theme .note-label.active { fill: #000000 !important; filter: none !important; font-weight: 900; }
   body.light-theme .note-part.dim, body.light-theme .note-label.dim { fill: #aaaaaa !important; opacity: 0.3 !important; }
+  body.light-theme .step-label { fill: #000000 !important; font-weight: 900; }
 
-  /* Interaction Styles */
+  /* Interactie Stijlen */
   .ring { cursor: grab; touch-action: none; pointer-events: all; }
   .ring:active { cursor: grabbing; }
   
-  /* Export logic to hide non-essentials */
+  /* Export logica om elementen te verbergen */
   .is-exporting .ad-slot, 
   .is-exporting .controls-top-right,
   .is-exporting .interaction-hint,
@@ -75,7 +73,7 @@
     justify-content: center; align-items: center;
   }
 
-  /* Ad Slots Styling */
+  /* Advertentie Kolommen */
   .ad-slot {
     position: absolute;
     top: 0;
@@ -131,7 +129,6 @@
     text-transform: uppercase; letter-spacing: 0.5px; text-align: center;
   }
 
-  /* Grid-based Chord List Layout */
   .chord-list { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; }
   .chord-item { display: block; border-radius: 6px; }
   .chord-row-content { 
@@ -217,7 +214,7 @@
   .compass-wrap { width: min(80vmin, 760px); aspect-ratio: 1; position: relative; touch-action: none; filter: drop-shadow(0 30px 80px rgba(0,0,0,0.7)); transition: filter var(--transition); }
   .light-theme .compass-wrap { filter: none; }
 
-  /* Interaction Hints */
+  /* Onboarding Hints */
   .note-label { font-size: 19px; font-weight: 700; fill: var(--ink); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; }
   .note-label.active { fill: var(--accent); filter: drop-shadow(0 0 10px var(--accent-glow)); font-size: 24px; opacity: 1; }
   .note-label.dim { opacity: 0.12; }
@@ -295,10 +292,10 @@
   .roman-text { font-size: 18px; fill: var(--accent); font-weight: 900; text-anchor: middle; }
   .chord-text { font-size: 12.5px; fill: #ffffff; font-weight: 800; text-anchor: middle; letter-spacing: 0.1px; }
 
-  /* Arrow group styles */
+  /* Pijl instellingen */
   .arrow-path { fill: url(#arrow-grad); stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; transition: stroke-width 0.2s, filter 0.2s; }
   
-  /* Selected arrow thick stroke hersteld */
+  /* Geselecteerde modus pijl dikte */
   .arrow-group.selected .arrow-path { stroke-width: 5px !important; filter: drop-shadow(0 0 12px var(--accent-glow)); }
 
   .arrow-group.pulsating .arrow-path {
@@ -312,6 +309,7 @@
     50% { transform: scale(1.1); stroke-width: 5; filter: brightness(1.5) drop-shadow(0 0 12px var(--accent-glow)); }
   }
 
+  /* Footer */
   .footer-under-compass {
     margin-top: 20px;
     font-size: 11px;
@@ -336,19 +334,19 @@
 
 <div class="app-container" id="captureRegion">
   
-  <!-- LEFT AD SLOT - Paste ad unit code inside 'ad-container' -->
+  <!-- LEFT AD SLOT - Plak advertentieblok code hieronder -->
   <div class="ad-slot ad-left">
     <div class="ad-placeholder-label">Advertisement</div>
     <div class="ad-container">
-      <!-- PASTE YOUR GOOGLE AD UNIT CODE HERE -->
+      <!-- PLAK HIER JE GOOGLE AD UNIT CODE -->
     </div>
   </div>
 
-  <!-- RIGHT AD SLOT - Paste ad unit code inside 'ad-container' -->
+  <!-- RIGHT AD SLOT - Plak advertentieblok code hieronder -->
   <div class="ad-slot ad-right">
     <div class="ad-placeholder-label">Advertisement</div>
     <div class="ad-container">
-      <!-- PASTE YOUR GOOGLE AD UNIT CODE HERE -->
+      <!-- PLAK HIER JE GOOGLE AD UNIT CODE -->
     </div>
   </div>
 
@@ -389,15 +387,15 @@
     <div class="mode-hint" id="modeHint">Select a mode</div>
     
     <div class="controls-top-right">
-      <button class="utility-btn" id="themeToggleBtn" title="Toggle Theme (Light/Dark)">
+      <button class="utility-btn" id="themeToggleBtn" title="Wissel Thema (Licht/Donker)">
         <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </button>
-      <button class="utility-btn" id="exportPngBtn" title="Export as PNG">
+      <button class="utility-btn" id="exportPngBtn" title="Exporteer als PNG">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       </button>
-      <button class="utility-btn" id="fullscreenBtn" title="Full Screen">
+      <button class="utility-btn" id="fullscreenBtn" title="Volledig Scherm">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
       </button>
     </div>
@@ -426,39 +424,38 @@
         <g id="innerCore">
           <circle r="172" fill="#0c121d" stroke="#1a2333" stroke-width="3" class="inner-circle" id="coreCircle"/>
           <g id="arrowsContainer"></g>
-          <g id="stepsContainer"></g>
           <circle r="10" fill="var(--ink)" class="center-dot"/>
         </g>
       </svg>
     </div>
 
     <aside class="info-panel" id="infoPanel">
-        <h3 class="info-title" id="infoTitle">Harmony</h3>
+        <h3 class="info-title" id="infoTitle">Harmonie</h3>
         <div class="chord-list" id="chordList"></div>
-        <div class="staff-label" style="margin-top: 15px;">Musical Staff</div>
+        <div class="staff-label" style="margin-top: 15px;">Notenbalk</div>
         <div class="staff-container" id="staffContainer"></div>
         <div class="spelling-note" id="spellingNote">
-          * Click a chord to highlight its notes.
-          <span class="tooltip-text">Clicking a chord keeps relevant notes bright while fading others in the scale. Labels adapt automatically.</span>
+          * Klik op een akkoord om de tonen te markeren.
+          <span class="tooltip-text">Bij het klikken op een akkoord blijven de relevante tonen fel terwijl anderen vervagen. Labels passen zich automatisch aan.</span>
         </div>
     </aside>
 
     <div class="footer-under-compass">
       Copyright &copy; 2012 Boris Klein Geltink | 
-      <a href="https://forms.gle/EeBv7sm9GpMNSeYE7" target="_blank">Contact Form</a>
+      <a href="https://forms.gle/EeBv7sm9GpMNSeYE7" target="_blank">Contactformulier</a>
     </div>
   </main>
 </div>
 
 <script>
 /**
- * Modal Compass Pro Logic
+ * Modal Compass Pro Logica
  */
 (() => {
   const DEG2RAD = Math.PI / 180;
   const STEP = 30;
   const SCALE_STEPS = [0, 2, 4, 5, 7, 9, 11];
-  const CONFIG = { noteR: 222, tickR: 265, arrowTip: 172, arrowNeck: 135, arrowBase: 36, stepR: 156 };
+  const CONFIG = { noteR: 222, tickR: 265, arrowTip: 172, arrowNeck: 135, arrowBase: 36 };
 
   const MODES = [
     { name: "Ionian", roman: "I", angle: -90, chords: ['maj', 'maj7', 'sus4'] },
@@ -487,7 +484,6 @@
     ticks: document.getElementById('ticksContainer'),
     notes: document.getElementById('notesContainer'),
     arrows: document.getElementById('arrowsContainer'),
-    steps: document.getElementById('stepsContainer'),
     fullscreenBtn: document.getElementById('fullscreenBtn'),
     themeToggleBtn: document.getElementById('themeToggleBtn'),
     exportPngBtn: document.getElementById('exportPngBtn'),
@@ -502,7 +498,7 @@
     modeHint: document.getElementById('modeHint')
   };
 
-  let state = { angle: 0, isDragging: false, startAngle: 0, startPointer: 0, raf: null, activePointerId: null, selectedModeIdx: null, startX: 0, startY: 0, spellingPreference: 1, manualOverride: false, selectedChord: null, hasRotated: false, hasSelectedMode: false };
+  let state = { angle: 0, isDragging: false, startAngle: 0, startPointer: 0, raf: null, activePointerId: null, selectedModeIdx: null, startX: 0, startY: 0, spellingPreference: 1, manualOverride: false, selectedChord: null, hasRotated: false, hasSelectedMode: false, animStartTime: null };
 
   const getPolar = (r, deg) => ({ x: r * Math.cos(deg * DEG2RAD), y: r * Math.sin(deg * DEG2RAD) });
 
@@ -703,11 +699,15 @@
   const getShortestPath = (target, current) => current + (((target - current + 180) % 360 + 360) % 360 - 180);
   function animateTo(targetAngle) {
     if (state.raf) cancelAnimationFrame(state.raf);
-    const start = state.angle, final = getShortestPath(targetAngle, start), dur = 600; let startT = null;
+    const start = state.angle, final = getShortestPath(targetAngle, start);
+    let localStartTime = null;
     const step = (now) => {
-      if (!startT) startT = now; const prog = Math.min((now - startT) / 600, 1);
-      state.angle = start + (final - start) * (1 - Math.pow(1 - prog, 3)); updateVisuals();
-      if (prog < 1) state.raf = requestAnimationFrame(step); else { state.angle = final % 360; state.startT = null; updateVisuals(); }
+      if (!localStartTime) localStartTime = now;
+      const prog = Math.min((now - localStartTime) / 600, 1);
+      state.angle = start + (final - start) * (1 - Math.pow(1 - prog, 3));
+      updateVisuals();
+      if (prog < 1) state.raf = requestAnimationFrame(step);
+      else { state.angle = final % 360; updateVisuals(); }
     };
     state.raf = requestAnimationFrame(step);
   }
@@ -745,13 +745,34 @@
     el.themeIcon.innerHTML = isLight ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>' : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'; 
     updateVisuals();
   });
+  
+  // Verbeterde download methode met Blobs
   el.exportPngBtn.addEventListener('click', async () => {
     document.body.classList.add('is-exporting');
     try {
-      const canvas = await html2canvas(document.getElementById('captureRegion'), { backgroundColor: getComputedStyle(document.body).backgroundColor, scale: 2 });
-      const link = document.createElement('a'); link.download = 'modal-compass-export.png'; link.href = canvas.toDataURL('image/png'); link.click();
-    } catch (e) { console.error("Export failed:", e); } finally { document.body.classList.remove('is-exporting'); }
+      const canvas = await html2canvas(document.getElementById('captureRegion'), { 
+        backgroundColor: getComputedStyle(document.body).backgroundColor, 
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+      });
+      
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'modal-compass-export.png';
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+      
+    } catch (e) { 
+      console.error("Export failed:", e); 
+    } finally { 
+      document.body.classList.remove('is-exporting'); 
+    }
   });
+
   el.ring.addEventListener('pointerdown', onPointerDown); el.ring.addEventListener('pointermove', onPointerMove); el.ring.addEventListener('pointerup', onPointerUp); el.ring.addEventListener('pointercancel', onPointerUp);
   updateVisuals();
 })();
