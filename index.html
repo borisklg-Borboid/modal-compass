@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Modal Compass Pro - Smartboard Optimized</title>
+<!-- Google AdSense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5641232243273162" crossorigin="anonymous"></script>
+<!-- External library for PNG export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0f16;
+    --ink: #e9edf5;
+    --ring-bg: #111827;
+    --line: #212936;
+    --accent: #00ffd0;
+    --accent-glow: rgba(0, 255, 208, 0.5);
+    --dim: rgba(233, 237, 245, 0.15);
+    --card-bg: rgba(17, 24, 39, 0.85);
+    --ad-width: 160px;
+    --panel-width: 280px; /* Symmetrical width for both panels */
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body.light-theme {
+    --bg: #ffffff;
+    --ink: #000000;
+    --ring-bg: #ffffff;
+    --line: #000000;
+    --accent: #000000;
+    --accent-glow: transparent;
+    --dim: rgba(0, 0, 0, 0.1);
+    --card-bg: #ffffff;
+    background: #ffffff !important;
+  }
+
+  /* SVG Overrides for Themes */
+  body.light-theme .main-bg-circle { fill: #ffffff !important; stroke: #000000 !important; stroke-width: 1px; }
+  body.light-theme .ring-circle { fill: #ffffff !important; stroke: #000000 !important; }
+  body.light-theme .inner-circle { fill: #ffffff !important; stroke: #000000 !important; }
+  body.light-theme .center-dot { fill: #000000 !important; filter: none !important; }
+  
+  /* Arrow paths: stroke-width must be overridable by .selected */
+  body.light-theme .arrow-path { fill: rgba(0,0,0,0.03) !important; stroke: #000000 !important; stroke-width: 1.5px; }
+  
+  body.light-theme .tick-dot { fill: #000000 !important; }
+  body.light-theme .roman-text, body.light-theme .chord-text { fill: #000000 !important; filter: none !important; }
+  body.light-theme .note-part.active, body.light-theme .note-label.active { fill: #000000 !important; filter: none !important; font-weight: 900; }
+  body.light-theme .note-part.dim, body.light-theme .note-label.dim { fill: #aaaaaa !important; opacity: 0.3 !important; }
+
+  /* Interaction Styles */
+  .ring { cursor: grab; touch-action: none; pointer-events: all; }
+  .ring:active { cursor: grabbing; }
+  
+  /* Export logic to hide non-essentials */
+  .is-exporting .ad-slot, 
+  .is-exporting .controls-top-right,
+  .is-exporting .interaction-hint,
+  .is-exporting .mode-hint { display: none !important; }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
+  body {
+    margin: 0;
+    background: radial-gradient(140% 120% at 50% 10%, #162031 0%, #0d121a 50%, #070a0f 100%);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    height: 100vh; width: 100vw; overflow: hidden; display: flex; user-select: none;
+    transition: background var(--transition);
+  }
+
+  .app-container {
+    position: relative; display: flex; width: 100vw; height: 100vh;
+    justify-content: center; align-items: center;
+  }
+
+  /* Ad Slots Styling */
+  .ad-slot {
+    position: absolute;
+    top: 0;
+    width: var(--ad-width);
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 40px;
+    z-index: 5;
+  }
+  .ad-left { left: 0; border-left: none; }
+  .ad-right { right: 0; border-right: none; }
+  .light-theme .ad-slot { background: rgba(0, 0, 0, 0.02); border-color: rgba(0, 0, 0, 0.05); }
+
+  .ad-placeholder-label {
+    color: rgba(255, 255, 255, 0.1);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .light-theme .ad-placeholder-label { color: rgba(0, 0, 0, 0.1); }
+
+  .ad-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .sidebar, .info-panel {
+    position: absolute; top: 50%; transform: translateY(-50%); z-index: 20;
+    display: flex; flex-direction: column; background: var(--card-bg);
+    backdrop-filter: blur(20px); border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5); transition: all var(--transition);
+    width: var(--panel-width);
+  }
+
+  .sidebar { left: calc(var(--ad-width) + 24px); padding: 24px 20px; gap: 20px; }
+  .info-panel { right: calc(var(--ad-width) + 24px); padding: 20px 16px; gap: 12px; opacity: 0; pointer-events: none; transform: translateY(-50%) translateX(20px); }
+  .info-panel.visible { opacity: 1; pointer-events: all; transform: translateY(-50%) translateX(0); }
+
+  .info-title {
+    font-size: 15px; font-weight: 800; color: var(--accent); margin: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.5px; text-align: center;
+  }
+
+  /* Grid-based Chord List Layout */
+  .chord-list { display: flex; flex-direction: column; gap: 6px; margin-top: 5px; }
+  .chord-item { display: block; border-radius: 6px; }
+  .chord-row-content { 
+    display: grid; 
+    grid-template-columns: 1fr 1.2fr 1.2fr; 
+    gap: 6px; 
+    align-items: center;
+  }
+  
+  .chord-pill { 
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap; 
+    opacity: 0.7; 
+    cursor: pointer; 
+    padding: 6px 2px; 
+    border-radius: 6px; 
+    transition: all 0.2s;
+    background: rgba(255,255,255,0.03); 
+    border: 1px solid rgba(255,255,255,0.05);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chord-pill:hover { opacity: 1; background: rgba(0, 255, 208, 0.1); border-color: rgba(0, 255, 208, 0.3); }
+  .chord-pill.active { opacity: 1; color: var(--bg); background: var(--accent); border-color: var(--accent); font-weight: 800; box-shadow: 0 4px 10px rgba(0, 255, 208, 0.2); }
+
+  .staff-container {
+    width: 100%; height: 140px; margin-top: 2px; position: relative;
+    border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 8px;
+    overflow: visible;
+  }
+  .staff-container svg text, .staff-container svg line { pointer-events: none; }
+  
+  .staff-label { 
+    font-size: 9px; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    color: var(--accent); 
+    opacity: 0.6; 
+    margin-bottom: -25px; 
+    margin-left: 5px; 
+    font-weight: 800;
+    position: relative;
+    z-index: 5;
+  }
+
+  .spelling-note {
+    font-size: 9px; font-style: italic; opacity: 0.4; text-align: center; margin-top: 10px;
+    color: var(--ink); position: relative; cursor: help;
+  }
+  .spelling-note:hover { opacity: 1; color: var(--accent); }
+  .spelling-note .tooltip-text {
+    visibility: hidden; width: 200px; background-color: #1a2333; color: #fff;
+    text-align: center; border-radius: 8px; padding: 10px; position: absolute;
+    z-index: 50; bottom: 125%; left: 50%; margin-left: -100px; opacity: 0;
+    transition: opacity 0.3s; font-size: 10px; line-height: 1.3;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); pointer-events: none;
+  }
+  .light-theme .spelling-note .tooltip-text { background-color: #ffffff; color: #000000; border: 1px solid #000; }
+  .spelling-note:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+  .logo-container { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+  .logo-icon { width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 0 5px var(--accent-glow)); }
+  .logo-icon svg { width: 100%; height: 100%; }
+  .logo-text { font-size: 15px; font-weight: 800; line-height: 1.1; letter-spacing: -0.5px; color: var(--ink); }
+
+  .legend-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .legend-item { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 600; padding: 6px 10px; border-radius: 8px; opacity: 0.8; pointer-events: none; }
+  .roman-badge { width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 2px solid var(--accent); color: var(--accent); font-weight: 800; font-size: 10px; background: rgba(0, 255, 208, 0.05); }
+
+  .controls-top-right { position: absolute; top: 24px; right: calc(var(--ad-width) + 24px); display: flex; gap: 12px; z-index: 30; }
+  .utility-btn {
+    background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 255, 208, 0.3); color: var(--accent);
+    width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; backdrop-filter: blur(5px);
+  }
+  .light-theme .utility-btn { background: #fff; border-color: #000; color: #000; }
+  .utility-btn:hover { border-color: var(--accent); background: rgba(0, 255, 208, 0.1); box-shadow: 0 0 10px var(--accent-glow); }
+
+  .compass-area { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 40px; touch-action: none; position: relative; }
+  .compass-wrap { width: min(80vmin, 760px); aspect-ratio: 1; position: relative; touch-action: none; filter: drop-shadow(0 30px 80px rgba(0,0,0,0.7)); transition: filter var(--transition); }
+  .light-theme .compass-wrap { filter: none; }
+
+  /* Interaction Hints */
+  .note-label { font-size: 19px; font-weight: 700; fill: var(--ink); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: auto; }
+  .note-label.active { fill: var(--accent); filter: drop-shadow(0 0 10px var(--accent-glow)); font-size: 24px; opacity: 1; }
+  .note-label.dim { opacity: 0.12; }
+  
+  .note-part { transition: fill 0.3s, opacity 0.3s; fill: inherit; pointer-events: auto; cursor: pointer; }
+
+  .interaction-hint {
+    position: absolute;
+    top: 5%; 
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    color: var(--bg);
+    padding: 8px 18px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    pointer-events: none;
+    z-index: 15;
+    opacity: 1;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    animation: bounceRotate 3s infinite ease-in-out;
+  }
+  .light-theme .interaction-hint { background: #000; color: #fff; border-color: #000; }
+  
+  .mode-hint {
+    position: absolute;
+    top: 15%; 
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    color: var(--bg);
+    padding: 8px 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 14;
+    opacity: 1;
+    transition: opacity 0.6s ease;
+    animation: bounceHint 2s infinite ease-in-out;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  }
+  .light-theme .mode-hint { background: #000; color: #fff; border-color: #000; }
+
+  @keyframes bounceRotate {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.05); }
+  }
+
+  @keyframes bounceHint {
+    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.8; }
+    50% { transform: translateX(-50%) translateY(-10px); opacity: 1; }
+  }
+
+  .roman-text, .chord-text { 
+    font-family: 'Inter', sans-serif !important; 
+    dominant-baseline: middle; 
+    pointer-events: none; 
+  }
+  .roman-text { font-size: 18px; fill: var(--accent); font-weight: 900; text-anchor: middle; }
+  .chord-text { font-size: 12.5px; fill: #ffffff; font-weight: 800; text-anchor: middle; letter-spacing: 0.1px; }
+
+  /* Arrow group styles */
+  .arrow-path { fill: url(#arrow-grad); stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; transition: stroke-width 0.2s, filter 0.2s; }
+  
+  /* Selected arrow thick stroke hersteld */
+  .arrow-group.selected .arrow-path { stroke-width: 5px !important; filter: drop-shadow(0 0 12px var(--accent-glow)); }
+
+  .arrow-group.pulsating .arrow-path {
+    animation: arrowSwell 1.5s infinite ease-in-out;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  
+  @keyframes arrowSwell {
+    0%, 100% { transform: scale(1); stroke-width: 2.5; filter: brightness(1); }
+    50% { transform: scale(1.1); stroke-width: 5; filter: brightness(1.5) drop-shadow(0 0 12px var(--accent-glow)); }
+  }
+
+  .footer-under-compass {
+    margin-top: 20px;
+    font-size: 11px;
+    opacity: 0.6;
+    text-align: center;
+  }
+  .footer-under-compass a { color: inherit; text-decoration: underline; margin-left: 5px; transition: opacity 0.2s; }
+  .footer-under-compass a:hover { opacity: 1; color: var(--accent); }
+
+  svg { width: 100%; height: 100%; overflow: visible; user-select: none; }
+  .arrow-group { cursor: pointer; pointer-events: all; }
+
+  @media (max-width: 1400px) {
+    .sidebar { left: 20px; }
+    .info-panel { right: 20px; }
+    .controls-top-right { right: 20px; }
+    .ad-slot { display: none; } 
+  }
+</style>
+</head>
+<body class="light-theme">
+
+<div class="app-container" id="captureRegion">
+  
+  <!-- LEFT AD SLOT - Paste ad unit code inside 'ad-container' -->
+  <div class="ad-slot ad-left">
+    <div class="ad-placeholder-label">Advertisement</div>
+    <div class="ad-container">
+      <!-- PASTE YOUR GOOGLE AD UNIT CODE HERE -->
+    </div>
+  </div>
+
+  <!-- RIGHT AD SLOT - Paste ad unit code inside 'ad-container' -->
+  <div class="ad-slot ad-right">
+    <div class="ad-placeholder-label">Advertisement</div>
+    <div class="ad-container">
+      <!-- PASTE YOUR GOOGLE AD UNIT CODE HERE -->
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="logo-container">
+      <div class="logo-icon">
+        <svg viewBox="0 0 100 100">
+          <g transform="translate(50,50)">
+            <path d="M -2.5,-8 L -9,-34 L 0,-44 L 9,-34 L 2.5,-8 Z" fill="none" stroke="var(--accent)" stroke-width="5" transform="rotate(0)"/>
+            <path d="M -2.5,-8 L -9,-34 L 0,-44 L 9,-34 L 2.5,-8 Z" fill="none" stroke="var(--accent)" stroke-width="5" transform="rotate(60)"/>
+            <path d="M -2.5,-8 L -9,-34 L 0,-44 L 9,-34 L 2.5,-8 Z" fill="none" stroke="var(--accent)" stroke-width="5" transform="rotate(120)"/>
+            <path d="M -2.5,-8 L -9,-34 L 0,-44 L 9,-34 L 2.5,-8 Z" fill="none" stroke="var(--accent)" stroke-width="5" transform="rotate(150)"/>
+            <path d="M -2.5,-8 L -9,-34 L 0,-44 L 9,-34 L 2.5,-8 Z" fill="none" stroke="var(--accent)" stroke-width="5" transform="rotate(210)"/>
+            <path d="M -2.5,-8 L -9,-34 L 0,-44 L 9,-34 L 2.5,-8 Z" fill="none" stroke="var(--accent)" stroke-width="5" transform="rotate(270)"/>
+            <path d="M -2.5,-8 L -9,-34 L 0,-44 L 9,-34 L 2.5,-8 Z" fill="none" stroke="var(--accent)" stroke-width="5" transform="rotate(330)"/>
+            <circle r="4" fill="var(--accent)" />
+          </g>
+        </svg>
+      </div>
+      <div class="logo-text">Modal<br>Compass</div>
+    </div>
+    <ul class="legend-list">
+        <li class="legend-item"><span class="roman-badge">I</span><span class="mode-name">Ionian</span></li>
+        <li class="legend-item"><span class="roman-badge">II</span><span class="mode-name">Dorian</span></li>
+        <li class="legend-item"><span class="roman-badge">III</span><span class="mode-name">Phrygian</span></li>
+        <li class="legend-item"><span class="roman-badge">IV</span><span class="mode-name">Lydian</span></li>
+        <li class="legend-item"><span class="roman-badge">V</span><span class="mode-name">Mixolydian</span></li>
+        <li class="legend-item"><span class="roman-badge">VI</span><span class="mode-name">Aeolian</span></li>
+        <li class="legend-item"><span class="roman-badge">VII</span><span class="mode-name">Locrian</span></li>
+    </ul>
+  </aside>
+
+  <main class="compass-area" id="compassArea">
+    <div class="interaction-hint" id="interactionHint">
+      <span>&larr;</span> Drag to rotate! <span>&rarr;</span>
+    </div>
+
+    <div class="mode-hint" id="modeHint">Select a mode</div>
+    
+    <div class="controls-top-right">
+      <button class="utility-btn" id="themeToggleBtn" title="Toggle Theme (Light/Dark)">
+        <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+      <button class="utility-btn" id="exportPngBtn" title="Export as PNG">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </button>
+      <button class="utility-btn" id="fullscreenBtn" title="Full Screen">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+    </div>
+
+    <div class="compass-wrap">
+      <svg id="masterSvg" viewBox="-280 -280 560 560">
+        <defs>
+          <radialGradient id="grad-bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="scale(280)">
+            <stop offset="0.75" stop-color="#0d1421"/><stop offset="1" stop-color="#05080d"/>
+          </radialGradient>
+          <linearGradient id="arrow-grad" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 255, 208, 0.05)" />
+            <stop offset="100%" stop-color="rgba(0, 255, 208, 0.22)" />
+          </linearGradient>
+          <filter id="glow-filter" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="7" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+        </defs>
+        <circle r="275" fill="url(#grad-bg)" class="main-bg-circle" id="bgCircle"/>
+        <g id="uiRing" class="ring" pointer-events="all">
+          <circle r="265" fill="var(--ring-bg)" stroke="rgba(255,255,255,0.05)" stroke-width="2" class="ring-circle" pointer-events="all"/>
+          <g id="ticksContainer"></g>
+          <g id="notesContainer"></g>
+        </g>
+        <g id="innerCore">
+          <circle r="172" fill="#0c121d" stroke="#1a2333" stroke-width="3" class="inner-circle" id="coreCircle"/>
+          <g id="arrowsContainer"></g>
+          <g id="stepsContainer"></g>
+          <circle r="10" fill="var(--ink)" class="center-dot"/>
+        </g>
+      </svg>
+    </div>
+
+    <aside class="info-panel" id="infoPanel">
+        <h3 class="info-title" id="infoTitle">Harmony</h3>
+        <div class="chord-list" id="chordList"></div>
+        <div class="staff-label" style="margin-top: 15px;">Musical Staff</div>
+        <div class="staff-container" id="staffContainer"></div>
+        <div class="spelling-note" id="spellingNote">
+          * Click a chord to highlight its notes.
+          <span class="tooltip-text">Clicking a chord keeps relevant notes bright while fading others in the scale. Labels adapt automatically.</span>
+        </div>
+    </aside>
+
+    <div class="footer-under-compass">
+      Copyright &copy; 2012 Boris Klein Geltink | 
+      <a href="https://forms.gle/EeBv7sm9GpMNSeYE7" target="_blank">Contact Form</a>
+    </div>
+  </main>
+</div>
+
+<script>
+/**
+ * Modal Compass Pro Logic
+ */
+(() => {
+  const DEG2RAD = Math.PI / 180;
+  const STEP = 30;
+  const SCALE_STEPS = [0, 2, 4, 5, 7, 9, 11];
+  const CONFIG = { noteR: 222, tickR: 265, arrowTip: 172, arrowNeck: 135, arrowBase: 36, stepR: 156 };
+
+  const MODES = [
+    { name: "Ionian", roman: "I", angle: -90, chords: ['maj', 'maj7', 'sus4'] },
+    { name: "Dorian", roman: "II", angle: -30, chords: ['min', 'm7', 'sus2'] },
+    { name: "Phrygian", roman: "III", angle: 30, chords: ['min', 'm7', '(♭9)'] },
+    { name: "Lydian", roman: "IV", angle: 60, chords: ['maj', 'maj7', '(#11)'] },
+    { name: "Mixolydian", roman: "V", angle: 120, chords: ['maj', '7', 'sus4'] },
+    { name: "Aeolian", roman: "VI", angle: 180, chords: ['min', 'm7', 'sus2'] },
+    { name: "Locrian", roman: "VII", angle: -120, chords: ['dim', 'm7♭5', 'sus4'] }
+  ];
+
+  const DUO_SPELLINGS = {
+    1: [{ name: "C#", letter: 0, pitch: 1 }, { name: "D♭", letter: 1, pitch: 1 }],
+    3: [{ name: "D#", letter: 1, pitch: 3 }, { name: "E♭", letter: 2, pitch: 3 }],
+    6: [{ name: "F#", letter: 3, pitch: 6 }, { name: "G♭", letter: 4, pitch: 6 }],
+    8: [{ name: "G#", letter: 4, pitch: 8 }, { name: "A♭", letter: 5, pitch: 8 }],
+    10: [{ name: "A#", letter: 5, pitch: 10 }, { name: "B♭", letter: 6, pitch: 10 }]
+  };
+
+  const ALPHABET = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+  const BASE_PITCHES = [0, 2, 4, 5, 7, 9, 11];
+
+  const el = {
+    svg: document.getElementById('masterSvg'),
+    ring: document.getElementById('uiRing'),
+    ticks: document.getElementById('ticksContainer'),
+    notes: document.getElementById('notesContainer'),
+    arrows: document.getElementById('arrowsContainer'),
+    steps: document.getElementById('stepsContainer'),
+    fullscreenBtn: document.getElementById('fullscreenBtn'),
+    themeToggleBtn: document.getElementById('themeToggleBtn'),
+    exportPngBtn: document.getElementById('exportPngBtn'),
+    themeIcon: document.getElementById('themeIcon'),
+    bgCircle: document.getElementById('bgCircle'),
+    coreCircle: document.getElementById('coreCircle'),
+    infoPanel: document.getElementById('infoPanel'),
+    infoTitle: document.getElementById('infoTitle'),
+    chordList: document.getElementById('chordList'),
+    staffContainer: document.getElementById('staffContainer'),
+    interactionHint: document.getElementById('interactionHint'),
+    modeHint: document.getElementById('modeHint')
+  };
+
+  let state = { angle: 0, isDragging: false, startAngle: 0, startPointer: 0, raf: null, activePointerId: null, selectedModeIdx: null, startX: 0, startY: 0, spellingPreference: 1, manualOverride: false, selectedChord: null, hasRotated: false, hasSelectedMode: false };
+
+  const getPolar = (r, deg) => ({ x: r * Math.cos(deg * DEG2RAD), y: r * Math.sin(deg * DEG2RAD) });
+
+  function countAccidentals(rootInfo) {
+    let count = 0;
+    SCALE_STEPS.forEach((s, degree) => {
+        const p = (rootInfo.pitch + s) % 12;
+        const letterIdx = (rootInfo.letter + degree) % 7;
+        const basePitch = BASE_PITCHES[letterIdx];
+        let diff = (p - basePitch + 24) % 12;
+        if (diff > 6) diff -= 12;
+        count += Math.abs(diff);
+    });
+    return count;
+  }
+
+  function spellNote(targetPitch, rootInfo, degreeIndex) {
+    const letterIdx = (rootInfo.letter + degreeIndex) % 7;
+    const letterName = ALPHABET[letterIdx];
+    const basePitch = BASE_PITCHES[letterIdx];
+    let diff = (targetPitch - basePitch + 24) % 12;
+    if (diff > 6) diff -= 12;
+    let acc = "";
+    if (diff === 1) acc = "#"; else if (diff === 2) acc = "##"; else if (diff === -1) acc = "♭"; else if (diff === -2) acc = "♭♭";
+    return { name: letterName + acc, letter: letterName, accidental: acc, pitch: targetPitch };
+  }
+
+  function getLogicalRootInfo() {
+    let ionianPitchAt12 = Math.round(-state.angle / STEP);
+    ionianPitchAt12 = ((ionianPitchAt12 % 12) + 12) % 12;
+    const getBestForPitch = (p) => {
+        if (!DUO_SPELLINGS[p]) {
+            const names = ["C", "", "D", "", "E", "F", "", "G", "", "A", "", "B"];
+            const letters = [0, -1, 1, -1, 2, 3, -1, 4, -1, 5, -1, 6];
+            return { name: names[p], letter: letters[p], pitch: p };
+        }
+        if (state.manualOverride) return DUO_SPELLINGS[p][state.spellingPreference];
+        const c1 = countAccidentals(DUO_SPELLINGS[p][0]);
+        const c2 = countAccidentals(DUO_SPELLINGS[p][1]);
+        return c1 <= c2 ? DUO_SPELLINGS[p][0] : DUO_SPELLINGS[p][1];
+    };
+    if (state.selectedModeIdx !== null) {
+        const pRoot = (ionianPitchAt12 + SCALE_STEPS[state.selectedModeIdx]) % 12;
+        const infoRoot = getBestForPitch(pRoot);
+        const ionLetter = (infoRoot.letter - state.selectedModeIdx + 7) % 7;
+        const ionBase = BASE_PITCHES[ionLetter];
+        let diff = (ionianPitchAt12 - ionBase + 24) % 12;
+        if (diff > 6) diff -= 12;
+        let acc = "";
+        if (diff === 1) acc = "#"; else if (diff === 2) acc = "##"; else if (diff === -1) acc = "♭"; else if (diff === -2) acc = "♭♭";
+        return { name: ALPHABET[ionLetter] + acc, letter: ionLetter, pitch: ionianPitchAt12 };
+    }
+    return getBestForPitch(ionianPitchAt12);
+  }
+
+  function renderStaff(container, notes, highlightIndices = null) {
+    const isLight = document.body.classList.contains('light-theme');
+    const color = isLight ? '#000' : '#fff';
+    const accent = isLight ? '#000' : '#00ffd0';
+    let html = `<svg viewBox="0 0 250 120" style="width:100%; height:100%;" preserveAspectRatio="xMidYMid meet">`;
+    for(let i=0; i<5; i++) html += `<line x1="5" y1="${40+(i*10)}" x2="245" y2="${40+(i*10)}" stroke="${color}" stroke-width="1" opacity="0.3"/>`;
+    html += `<text x="2" y="85" font-family="serif" font-size="65" fill="${color}" opacity="0.8">𝄞</text>`;
+    const letterMap = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
+    let octOff = 0; let lastLetter = null;
+    const startX = notes[0] && notes[0].accidental ? (notes[0].accidental.length > 1 ? 68 : 62) : 52; 
+    notes.forEach((n, i) => {
+        const isHi = highlightIndices === null || highlightIndices.has(i);
+        const op = isHi ? 1 : 0.15;
+        const lVal = letterMap[n.letter];
+        if (lastLetter !== null && lVal <= lastLetter) octOff++;
+        lastLetter = lVal;
+        const y = 90 - ((lVal + (octOff * 7)) * 5);
+        const x = startX + (i * 24); 
+        if (y >= 90) for (let ly = 90; ly <= y; ly += 10) html += `<line x1="${x-8}" y1="${ly}" x2="${x+8}" y2="${ly}" stroke="${color}" stroke-width="1.2" opacity="${op*0.4}"/>`;
+        if (y <= 30) for (let ly = 30; ly >= y; ly -= 10) html += `<line x1="${x-8}" y1="${ly}" x2="${x+8}" y2="${ly}" stroke="${color}" stroke-width="1.2" opacity="${op*0.4}"/>`;
+        if (n.accidental) {
+            let sym = ""; let off = 13;
+            if (n.accidental === "##") { sym = "𝄪"; off = 17; } else if (n.accidental === "♭♭") { sym = "𝄫"; off = 17; } else if (n.accidental === "#") { sym = "♯"; } else if (n.accidental === "♭") { sym = "♭"; }
+            html += `<text x="${x-off}" y="${y}" font-size="16" fill="${accent}" font-weight="600" dominant-baseline="central" opacity="${op}">${sym}</text>`;
+        }
+        html += `<ellipse cx="${x}" cy="${y}" rx="4.5" ry="3.5" fill="${accent}" transform="rotate(-20, ${x}, ${y})" opacity="${op}"/>`;
+        const sD = y < 60 ? 1 : -1; 
+        html += `<line x1="${x+(sD>0?-4:4)}" y1="${y}" x2="${x+(sD>0?-4:4)}" y2="${y+(sD*27)}" stroke="${accent}" stroke-width="1.1" opacity="${op}"/>`;
+        html += `<text x="${x}" y="112" font-size="9" fill="${color}" font-weight="800" text-anchor="middle" opacity="${op * 0.8}">${n.name}</text>`;
+    });
+    html += `</svg>`;
+    container.innerHTML = html;
+  }
+
+  const noteNodes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => {
+    const p = getPolar(CONFIG.noteR, -90 + i * STEP);
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', p.x); txt.setAttribute('y', p.y + 7); txt.setAttribute('text-anchor', 'middle');
+    txt.classList.add('note-label'); el.notes.appendChild(txt);
+    return { el: txt, index: i, duo: !!DUO_SPELLINGS[i] };
+  });
+
+  function updateVisuals() {
+    el.ring.setAttribute('transform', `rotate(${state.angle})`);
+    const root = getLogicalRootInfo();
+    const activeMap = {}; 
+    SCALE_STEPS.forEach((s, deg) => activeMap[(root.pitch + s) % 12] = spellNote((root.pitch + s) % 12, root, deg));
+    noteNodes.forEach(n => {
+      const x = parseFloat(n.el.getAttribute('x')), y = parseFloat(n.el.getAttribute('y'));
+      n.el.setAttribute('transform', `rotate(${-state.angle}, ${x}, ${y})`);
+      const active = activeMap[n.index] !== undefined;
+      n.el.classList.remove('active', 'dim');
+      if (n.duo) {
+          n.el.innerHTML = "";
+          const p1 = DUO_SPELLINGS[n.index][0].name, p2 = DUO_SPELLINGS[n.index][1].name;
+          const s1 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan'); s1.textContent = p1; s1.classList.add('note-part'); s1.setAttribute('data-pref', '0');
+          const sep = document.createElementNS('http://www.w3.org/2000/svg', 'tspan'); sep.textContent = "/"; sep.classList.add('separator');
+          const s2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan'); s2.textContent = p2; s2.classList.add('note-part'); s2.setAttribute('data-pref', '1');
+          if (active) {
+             n.el.classList.add('active'); const sp = activeMap[n.index];
+             if (sp.name === p1) { s1.classList.add('active'); s2.classList.add('dim'); } else { s2.classList.add('active'); s1.classList.add('dim'); }
+          } else {
+             n.el.classList.add('dim'); 
+             const c1 = countAccidentals(DUO_SPELLINGS[n.index][0]), c2 = countAccidentals(DUO_SPELLINGS[n.index][1]);
+             const best = (state.manualOverride ? state.spellingPreference : (c1 <= c2 ? 0 : 1));
+             if (best === 0) { s1.classList.add('preferred'); s2.classList.add('dim'); } else { s2.classList.add('preferred'); s1.classList.add('dim'); }
+          }
+          n.el.appendChild(s1); n.el.appendChild(sep); n.el.appendChild(s2);
+      } else {
+          n.el.textContent = active ? activeMap[n.index].name : ["C", "", "D", "", "E", "F", "", "G", "", "A", "", "B"][n.index];
+          n.el.classList.add(active ? 'active' : 'dim');
+      }
+    });
+
+    if (state.selectedModeIdx !== null) {
+      const mode = MODES[state.selectedModeIdx];
+      const mRootP = (root.pitch + SCALE_STEPS[state.selectedModeIdx]) % 12;
+      el.infoTitle.textContent = `${spellNote(mRootP, root, state.selectedModeIdx).name} ${mode.name.toUpperCase()}`;
+      const indices = [...MODES.keys()].slice(state.selectedModeIdx).concat([...MODES.keys()].slice(0, state.selectedModeIdx));
+      const staffNotes = [];
+      el.chordList.innerHTML = indices.map((oIdx, listIdx) => {
+        const m = MODES[oIdx]; const p = (root.pitch + SCALE_STEPS[oIdx]) % 12; const sp = spellNote(p, root, oIdx); staffNotes.push(sp);
+        const row = m.chords.map((suf, cIdx) => {
+            const active = state.selectedChord && state.selectedChord.degree === listIdx && state.selectedChord.type === cIdx;
+            return `<span class="chord-pill ${active?'active':''}" onclick="window.toggleChord(${listIdx}, ${cIdx})">${sp.name}${suf}</span>`;
+        }).join('');
+        return `<div class="chord-item"><div class="chord-row-content">${row}</div></div>`;
+      }).join('');
+      staffNotes.push(spellNote(mRootP, root, state.selectedModeIdx));
+      let hi = null;
+      if (state.selectedChord) {
+          hi = new Set(); const b = state.selectedChord.degree; const t = state.selectedChord.type;
+          const degs = [b, (b+2)%7, (b+4)%7]; if(t===1) degs.push((b+6)%7);
+          if(t===2) { 
+              const s = MODES[indices[b]].chords[2];
+              if(s==='sus4') degs[1]=(b+3)%7; else if(s==='sus2') degs[1]=(b+1)%7; else if(s==='(♭9)') degs.push((b+1)%7); else if(s==='(#11)') degs.push((b+3)%7);
+          }
+          degs.forEach(d => { hi.add(d); if(d===0) hi.add(7); });
+      }
+      renderStaff(el.staffContainer, staffNotes, hi);
+    }
+    document.querySelectorAll('.arrow-group').forEach((g, i) => {
+      g.classList.toggle('selected', i === state.selectedModeIdx);
+      g.classList.toggle('pulsating', !state.hasSelectedMode && i === 0);
+    });
+  }
+
+  window.toggleChord = (deg, type) => { state.selectedChord = (state.selectedChord?.degree === deg && state.selectedChord?.type === type) ? null : { degree: deg, type }; updateVisuals(); };
+
+  for (let i = 0; i < 12; i++) {
+    const p = getPolar(CONFIG.tickR, -90 + i * STEP);
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); dot.setAttribute('r', 2.8);
+    dot.classList.add('tick-dot'); el.ticks.appendChild(dot);
+  }
+
+  MODES.forEach((mode, i) => {
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g'); group.classList.add('arrow-group');
+    const aC = mode.angle, spread = 28;
+    const pts = [getPolar(CONFIG.arrowBase, aC - spread/2), getPolar(CONFIG.arrowNeck, aC - spread/2), getPolar(CONFIG.arrowTip, aC), getPolar(CONFIG.arrowNeck, aC + spread/2), getPolar(CONFIG.arrowBase, aC + spread/2)];
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y} L${pts[3].x},${pts[3].y} L${pts[4].x},${pts[4].y}Z`);
+    path.classList.add('arrow-path'); group.appendChild(path);
+    const pR = getPolar(CONFIG.arrowTip - 24, aC);
+    const roman = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    roman.setAttribute('x', pR.x); roman.setAttribute('y', pR.y + 6); roman.classList.add('roman-text'); roman.textContent = mode.roman; group.appendChild(roman);
+    mode.chords.forEach((chord, ci) => {
+      let r, aO = 0; if (mode.roman === 'VI' && ci < 2) { r = CONFIG.arrowTip - 65; aO = (ci === 0) ? -7.5 : 7.5; } else if (mode.roman === 'VI' && ci >= 2) r = CONFIG.arrowTip - 95; else r = CONFIG.arrowTip - 58 - (ci * 21);
+      const pC = getPolar(r, aC + aO);
+      const cTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      cTxt.setAttribute('x', pC.x); cTxt.setAttribute('y', pC.y); cTxt.classList.add('chord-text'); cTxt.textContent = chord; group.appendChild(cTxt);
+    });
+    group.addEventListener('click', (e) => {
+        e.stopPropagation(); state.selectedChord = null; state.hasSelectedMode = true;
+        state.selectedModeIdx = (state.selectedModeIdx === i) ? null : i;
+        if (state.selectedModeIdx === null) el.infoPanel.classList.remove('visible'); else el.infoPanel.classList.add('visible');
+        if (el.modeHint) { el.modeHint.style.opacity = '0'; setTimeout(() => { if(el.modeHint) el.modeHint.remove(); }, 600); }
+        updateVisuals();
+    });
+    el.arrows.appendChild(group);
+  });
+
+  const getShortestPath = (target, current) => current + (((target - current + 180) % 360 + 360) % 360 - 180);
+  function animateTo(targetAngle) {
+    if (state.raf) cancelAnimationFrame(state.raf);
+    const start = state.angle, final = getShortestPath(targetAngle, start), dur = 600; let startT = null;
+    const step = (now) => {
+      if (!startT) startT = now; const prog = Math.min((now - startT) / 600, 1);
+      state.angle = start + (final - start) * (1 - Math.pow(1 - prog, 3)); updateVisuals();
+      if (prog < 1) state.raf = requestAnimationFrame(step); else { state.angle = final % 360; state.startT = null; updateVisuals(); }
+    };
+    state.raf = requestAnimationFrame(step);
+  }
+
+  const getPointerAngle = (e) => { const rect = el.svg.getBoundingClientRect(); return Math.atan2(e.clientY - (rect.top + rect.height/2), e.clientX - (rect.left + rect.width / 2)) * (180 / Math.PI) + 90; };
+  
+  const onPointerDown = (e) => { 
+    if (state.isDragging) return; state.isDragging = true; state.activePointerId = e.pointerId; state.startX = e.clientX; state.startY = e.clientY;
+    state.startAngle = state.angle; state.startPointer = getPointerAngle(e);
+    if (state.raf) cancelAnimationFrame(state.raf); el.ring.setPointerCapture(e.pointerId); 
+  };
+  
+  const onPointerMove = (e) => { 
+    if (!state.isDragging || e.pointerId !== state.activePointerId) return; 
+    let d = getPointerAngle(e) - state.startPointer; if (d > 180) d -= 360; if (d < -180) d += 360; state.angle = state.startAngle + d; 
+    updateVisuals(); if (Math.abs(d) > 3) { state.manualOverride = false; state.hasRotated = true; }
+  };
+  
+  const onPointerUp = (e) => { 
+    if (!state.isDragging || e.pointerId !== state.activePointerId) return; state.isDragging = false; 
+    const moveDist = Math.hypot(e.clientX - state.startX, e.clientY - state.startY);
+    if (moveDist < 15) {
+      const hit = document.elementFromPoint(e.clientX, e.clientY);
+      if (hit && hit.classList.contains('note-part')) { state.manualOverride = true; state.spellingPreference = parseInt(hit.getAttribute('data-pref')); updateVisuals(); }
+    }
+    if (state.hasRotated && el.interactionHint) { el.interactionHint.style.opacity = '0'; setTimeout(() => { if(el.interactionHint) el.interactionHint.remove(); }, 600); }
+    animateTo(Math.round(state.angle / STEP) * STEP); el.ring.releasePointerCapture(e.pointerId); 
+  };
+
+  el.bgCircle.addEventListener('click', () => { state.selectedModeIdx = null; state.selectedChord = null; el.infoPanel.classList.remove('visible'); updateVisuals(); });
+  el.coreCircle.addEventListener('click', () => { state.selectedModeIdx = null; state.selectedChord = null; el.infoPanel.classList.remove('visible'); updateVisuals(); });
+  el.fullscreenBtn.addEventListener('click', () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); });
+  el.themeToggleBtn.addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light-theme');
+    el.themeIcon.innerHTML = isLight ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>' : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'; 
+    updateVisuals();
+  });
+  el.exportPngBtn.addEventListener('click', async () => {
+    document.body.classList.add('is-exporting');
+    try {
+      const canvas = await html2canvas(document.getElementById('captureRegion'), { backgroundColor: getComputedStyle(document.body).backgroundColor, scale: 2 });
+      const link = document.createElement('a'); link.download = 'modal-compass-export.png'; link.href = canvas.toDataURL('image/png'); link.click();
+    } catch (e) { console.error("Export failed:", e); } finally { document.body.classList.remove('is-exporting'); }
+  });
+  el.ring.addEventListener('pointerdown', onPointerDown); el.ring.addEventListener('pointermove', onPointerMove); el.ring.addEventListener('pointerup', onPointerUp); el.ring.addEventListener('pointercancel', onPointerUp);
+  updateVisuals();
+})();
+</script>
+</body>
+</html>
