@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-<title>Modal Compass - Music Theory & Harmony Tool</title>
+<title>Modal Compass Pro - Music Theory & Harmony Tool</title>
 <!-- Google AdSense Hoofdscript -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5641232243273162" crossorigin="anonymous"></script>
 <!-- Externe bibliotheek voor PNG export -->
@@ -61,9 +61,10 @@
     flex-direction: column;
     user-select: none;
     transition: background var(--transition);
+    touch-action: none; /* Voorkomt pull-to-refresh en haperend scrollen tijdens drag */
   }
 
-  /* 5-Column Layout Architecture - Prevents Overlap */
+  /* 5-Column Layout Architecture */
   .app-layout {
     display: flex;
     flex-direction: row;
@@ -101,7 +102,7 @@
 
   .sidebar, .info-panel {
     width: var(--panel-width);
-    max-height: 90vh;
+    max-height: 92vh;
     flex-shrink: 0;
     background: var(--card-bg);
     backdrop-filter: blur(20px);
@@ -116,7 +117,7 @@
   .info-panel { opacity: 0; pointer-events: none; transform: translateX(20px); }
   .info-panel.visible { opacity: 1; pointer-events: all; transform: translateX(0); }
 
-  /* Compass Area Styling - Dynamic Scaling */
+  /* Compass Area Scaling */
   .compass-area {
     flex-grow: 1;
     display: flex;
@@ -126,6 +127,7 @@
     min-width: 0;
     height: 100%;
     position: relative;
+    touch-action: none;
   }
 
   .compass-wrap {
@@ -134,11 +136,12 @@
     position: relative;
     filter: drop-shadow(0 30px 60px rgba(0,0,0,0.6));
     transition: filter var(--transition);
+    touch-action: none;
   }
 
   /* Interaction Hints (Onboarding) */
   .interaction-hint {
-    position: absolute; top: 5%; left: 50%; transform: translateX(-50%);
+    position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
     background: var(--ink); border: 1px solid var(--ink); color: var(--bg);
     padding: 8px 18px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 12px;
     pointer-events: none; z-index: 15; opacity: 1; transition: 0.6s ease; font-size: 11px; font-weight: 900;
@@ -147,7 +150,7 @@
   .light-theme .interaction-hint { background: #000; color: #fff; border-color: #000; }
   
   .mode-hint {
-    position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+    position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
     background: var(--ink); border: 1px solid var(--ink); color: var(--bg);
     padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
     pointer-events: none; z-index: 14; opacity: 1; transition: 0.6s ease;
@@ -159,7 +162,10 @@
   @keyframes bounceRotate { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
   @keyframes bounceHint { 0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.8; } 50% { transform: translateX(-50%) translateY(-10px); opacity: 1; } }
 
-  /* Utility Styles */
+  /* Pulsating Arrow Animation */
+  @keyframes arrowSwell { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.08); opacity: 1; filter: brightness(1.3) drop-shadow(0 0 15px var(--accent-glow)); } }
+  .arrow-group.pulsating .arrow-path { animation: arrowSwell 1.5s infinite ease-in-out; transform-origin: center; transform-box: fill-box; }
+
   .ring { cursor: grab; touch-action: none; pointer-events: all; }
   .ring:active { cursor: grabbing; }
 
@@ -192,18 +198,76 @@
   .utility-btn:hover { border-color: var(--accent); background: rgba(0, 255, 208, 0.1); transform: translateY(-2px); }
 
   /* Component UI Elements */
-  .info-title { font-size: 14px; font-weight: 800; color: var(--accent); text-align: center; border-bottom: 1px solid var(--dim); padding-bottom: 10px; margin-bottom: 10px; text-transform: uppercase; }
+  .info-title { font-size: 14px; font-weight: 800; color: var(--accent); text-align: center; border-bottom: 1px solid var(--dim); padding-bottom: 8px; margin-bottom: 8px; text-transform: uppercase; }
   .chord-pill { font-size: 10px; font-weight: 700; padding: 6px 2px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid var(--dim); text-align: center; cursor: pointer; }
   .chord-pill.active { background: var(--accent); color: var(--bg); font-weight: 800; }
   .chord-row-content { display: grid; grid-template-columns: 1fr 1.1fr 1.1fr; gap: 4px; margin-bottom: 4px; }
   .staff-container { width: 100%; height: 120px; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); }
-  .logo-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px; }
-  .logo-text { font-size: 14px; font-weight: 800; line-height: 1.1; }
-  .legend-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+  .logo-container { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 8px; }
+  .logo-text { font-size: 14px; font-weight: 800; line-height: 1.1; white-space: nowrap; }
+  .legend-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
   .legend-item { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; opacity: 0.8; }
-  .roman-badge { width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 1.5px solid var(--accent); color: var(--accent); font-weight: 800; font-size: 9px; }
+  .roman-badge { width: 22px; height: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 1.5px solid var(--accent); color: var(--accent); font-weight: 800; font-size: 9px; }
 
-  /* SVG Note styling */
+  /* PORTRAIT MOBILE: Compact and No-Scroll */
+  @media (max-width: 1120px) and (orientation: portrait) {
+    body { overflow: hidden; height: 100vh; }
+    .app-layout { flex-direction: column; }
+    .ad-slot { display: none; }
+    .main-content { 
+      flex-direction: column; 
+      padding: 10px; 
+      gap: 10px; 
+      justify-content: flex-start;
+      height: 100%;
+    }
+    .sidebar, .info-panel {
+      width: 100%;
+      max-width: none;
+      padding: 10px 15px;
+      border-radius: 15px;
+      box-shadow: none;
+      background: rgba(17, 24, 39, 0.6);
+      margin: 0;
+    }
+    .sidebar { order: 1; }
+    .compass-area { order: 2; flex-grow: 1; height: auto; padding: 0; margin: -10px 0; }
+    .info-panel { order: 3; margin-top: auto; padding-top: 5px; }
+    
+    .logo-container { margin-bottom: 5px; padding-bottom: 5px; justify-content: center; }
+    .logo-text { font-size: 13px; }
+    .legend-list {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+    .legend-item { font-size: 10px; gap: 4px; }
+    .roman-badge { width: 18px; height: 18px; font-size: 8px; }
+    
+    .compass-wrap { width: 78vmin; }
+    .info-title { padding-bottom: 4px; margin-bottom: 5px; font-size: 12px; }
+    .staff-container { height: 90px; margin-top: 2px; }
+    .spelling-note { display: none; }
+    
+    .controls-top-right { 
+      position: fixed; top: 10px; right: 10px; gap: 8px;
+      background: var(--bg); border-radius: 10px; padding: 3px; 
+    }
+    .utility-btn { width: 36px; height: 36px; }
+  }
+
+  /* LANDSCAPE (TABLET/MOBILE): Circle middle, Panels left/right */
+  @media (max-height: 650px) and (orientation: landscape) {
+    .main-content { gap: 10px; flex-direction: row; }
+    .sidebar, .info-panel { width: 210px; padding: 12px; }
+    .compass-wrap { width: 80vmin; }
+    .staff-container { height: 85px; }
+    .logo-container { margin-bottom: 5px; }
+    .controls-top-right { top: 8px; right: 8px; }
+    .utility-btn { width: 34px; height: 34px; }
+  }
+
+  /* Note Labels */
   .note-label { font-size: 19px; font-weight: 700; fill: var(--ink); transition: 0.4s; pointer-events: none; }
   .note-label.active { fill: var(--accent); filter: drop-shadow(0 0 10px var(--accent-glow)); font-size: 24px; opacity: 1; }
   .note-label.dim { opacity: 0.12; }
@@ -218,40 +282,8 @@
   .arrow-path { fill: url(#arrow-grad); stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; transition: 0.2s; }
   .arrow-group.selected .arrow-path { stroke-width: 5px !important; filter: drop-shadow(0 0 12px var(--accent-glow)); }
 
-  /* Responsive Scaling */
-  @media (max-width: 1400px) {
-    .main-content { gap: 10px; }
-    .sidebar, .info-panel { width: 240px; }
-  }
-
-  /* PORTRAIT: Stack vertically */
-  @media (max-width: 1120px) and (orientation: portrait) {
-    body { overflow-y: auto; overflow-x: hidden; height: auto; }
-    .app-layout { flex-direction: column; height: auto; }
-    .ad-slot { display: none; }
-    .main-content { flex-direction: column; padding: 80px 20px 40px 20px; gap: 30px; height: auto; }
-    .sidebar, .info-panel, .compass-area {
-      width: 100%; max-width: 500px; transform: none !important; opacity: 1 !important; pointer-events: all !important; position: static;
-    }
-    .legend-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
-    .compass-wrap { width: 90vw; max-width: 450px; margin-top: 20px; }
-    .controls-top-right { position: fixed; top: 12px; right: 12px; background: var(--bg); border-radius: 12px; padding: 4px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-    .interaction-hint, .mode-hint { display: none; }
-  }
-
-  /* LANDSCAPE (TABLET/MOBILE): Keep middle circle */
-  @media (max-height: 650px) and (orientation: landscape) {
-    .main-content { gap: 10px; flex-direction: row; }
-    .sidebar, .info-panel { width: 220px; padding: 15px; }
-    .compass-wrap { width: 80vmin; }
-    .staff-container { height: 90px; }
-    .logo-container { margin-bottom: 5px; }
-    .controls-top-right { top: 10px; right: 10px; }
-  }
-
-  /* Export Guard */
   .is-exporting .ad-slot, .is-exporting .controls-top-right, .is-exporting .interaction-hint, .is-exporting .mode-hint { display: none !important; }
-  .footer-under-compass { margin-top: 15px; font-size: 10px; opacity: 0.5; text-align: center; }
+  .footer-under-compass { margin-top: 5px; font-size: 9px; opacity: 0.4; text-align: center; }
   .footer-under-compass a { color: inherit; }
   svg { width: 100%; height: 100%; overflow: visible; user-select: none; }
 </style>
@@ -262,27 +294,27 @@
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-content">
     <button class="modal-close" id="modalClose">&times;</button>
-    <h2>About Modal Compass </h2>
-    <p><strong>Modal Compass </strong> is a high-end interactive educational platform designed specifically for <strong>music teachers, music students, and theoretical enthusiasts</strong>. It serves as a visual bridge between abstract music theory and practical application.</p>
+    <h2>About Modal Compass Pro</h2>
+    <p><strong>Modal Compass Pro</strong> is a professional interactive educational tool designed for <strong>music teachers, music students, and theoretical enthusiasts</strong>. It visualizes the deep relationships between church modes and diatonic harmony.</p>
     
     <h3>The Purpose of this Tool</h3>
-    <p>Understanding the relationship between church modes, scale degrees, and diatonic harmony is a cornerstone of musical mastery. This tool provides an instant, interactive visualization of these concepts across all 12 keys. It is optimized for use on smartboards in classrooms, tablets in study environments, and desktops for composers.</p>
+    <p>This tool provides an instant visualization of musical concepts across all 12 keys. Optimized for smartboards, tablets, and desktop environments, it bridges the gap between abstract theory and practical understanding.</p>
     
     <h3>Key Features</h3>
     <ul>
-      <li><strong>Interactive Root Selection:</strong> Drag the outer ring to select your root note. All intervals and harmonic relations update instantly.</li>
-      <li><strong>Modal Analysis:</strong> Select any of the seven church modes (Ionian to Locrian) to visualize its unique interval structure and characteristic notes.</li>
-      <li><strong>Diatonic Harmony:</strong> Explore the chords built on each scale degree. Highlighting a chord shows its notation on the musical staff, reinforcing the connection between theory and sight-reading.</li>
-      <li><strong>Dual Spelling Support:</strong> Click on notes with two names (like C#/Db) to toggle your preferred musical spelling.</li>
+      <li><strong>Interactive Root Selection:</strong> Drag the outer ring to select your root note. All intervals update instantly.</li>
+      <li><strong>Modal Analysis:</strong> Click Roman Numerals (I-VII) to activate a mode and see its characteristic notes.</li>
+      <li><strong>Harmonic Visualization:</strong> Explore chords built on each degree. Click a chord to see its notation on the staff.</li>
+      <li><strong>Dual Spelling:</strong> Click on enharmonic notes (like C#/Db) to toggle your preferred spelling.</li>
     </ul>
 
     <h3>How to use</h3>
-    <p>1. <strong>Rotate</strong> the outer ring to set your desired key.<br>
-       2. <strong>Click</strong> on a scale degree (Roman Numerals I-VII) to activate a specific mode.<br>
-       3. <strong>Select</strong> a chord label in the harmony panel to visualize the chord structure on the staff.<br>
-       4. <strong>Toggle</strong> between Dark and Light mode for optimal visibility in any environment.</p>
+    <p>1. <strong>Rotate</strong> the outer ring to set the key.<br>
+       2. <strong>Click</strong> a Roman Numeral to choose a mode.<br>
+       3. <strong>Select</strong> a chord to visualize it on the musical staff.<br>
+       4. <strong>Toggle</strong> Dark/Light mode for best visibility.</p>
     
-    <p><em>Created to empower musicians with deep, visual theoretical insights.</em></p>
+    <p><em>Empowering musicians with visual theoretical insights.</em></p>
   </div>
 </div>
 
@@ -290,11 +322,10 @@
   
   <div class="ad-slot ad-left">
     <div class="ad-placeholder-label">Advertisement</div>
-    <div class="ad-container"><!-- ADS CODE HERE --></div>
+    <div class="ad-container"><!-- ADS --></div>
   </div>
 
   <main class="main-content">
-    <!-- Onboarding Hints -->
     <div class="interaction-hint" id="interactionHint"><span>&larr;</span> Drag to rotate! <span>&rarr;</span></div>
     <div class="mode-hint" id="modeHint">Select a mode</div>
 
@@ -307,14 +338,14 @@
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </button>
-      <button class="utility-btn" id="exportPngBtn" title="Exporteer als PNG">
+      <button class="utility-btn" id="exportPngBtn" title="Exporteer PNG">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       </button>
     </div>
 
     <aside class="sidebar">
       <div class="logo-container">
-        <div class="logo-text">Modal<br>Compass</div>
+        <div class="logo-text">Modal Compass Pro</div>
       </div>
       <ul class="legend-list">
           <li class="legend-item"><span class="roman-badge">I</span> Ionian</li>
@@ -357,20 +388,16 @@
         <h3 class="info-title" id="infoTitle">Harmony</h3>
         <div class="chord-list" id="chordList"></div>
         <div class="staff-container" id="staffContainer"></div>
-        <div class="spelling-note" id="spellingNote">* Click a chord to highlight notes.</div>
     </aside>
   </main>
 
   <div class="ad-slot ad-right">
     <div class="ad-placeholder-label">Advertisement</div>
-    <div class="ad-container"><!-- ADS CODE HERE --></div>
+    <div class="ad-container"><!-- ADS --></div>
   </div>
 </div>
 
 <script>
-/**
- * Logic Implementation
- */
 (() => {
   const DEG2RAD = Math.PI / 180;
   const STEP = 30;
@@ -571,6 +598,8 @@
     }
     document.querySelectorAll('.arrow-group').forEach((g, i) => {
         g.classList.toggle('selected', i === state.selectedModeIdx);
+        // Flashende pijl animatie (Onboarding hersteld)
+        g.classList.toggle('pulsating', !state.hasSelectedMode && i === 0);
     });
   }
 
@@ -588,12 +617,12 @@
   el.ring.onpointermove = (e) => { 
     if (!state.isDragging) return; 
     let d = getAngle(e) - state.startPointer; if (d > 180) d -= 360; if (d < -180) d += 360; state.angle = state.startAngle + d; 
-    updateVisuals(); if (Math.abs(d) > 3) { state.manualOverride = false; state.hasRotated = true; }
+    updateVisuals(); if (Math.abs(d) > 2) { state.manualOverride = false; state.hasRotated = true; }
   };
   el.ring.onpointerup = (e) => { 
     state.isDragging = false; 
     const dist = Math.hypot(e.clientX - state.startX, e.clientY - state.startY);
-    if (dist < 10) {
+    if (dist < 12) {
         const hit = document.elementFromPoint(e.clientX, e.clientY);
         if (hit && hit.classList.contains('note-part')) {
             state.manualOverride = true; state.spellingPreference = parseInt(hit.getAttribute('data-pref'));
