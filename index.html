@@ -61,7 +61,7 @@
     flex-direction: column;
     user-select: none;
     transition: background var(--transition);
-    touch-action: none; /* Voorkomt pull-to-refresh en haperend scrollen tijdens drag */
+    touch-action: none;
   }
 
   /* 5-Column Layout Architecture */
@@ -139,7 +139,11 @@
     touch-action: none;
   }
 
-  /* Interaction Hints (Onboarding) */
+  /* Onboarding Animations */
+  @keyframes bounceRotate { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
+  @keyframes bounceHint { 0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.8; } 50% { transform: translateX(-50%) translateY(-10px); opacity: 1; } }
+  @keyframes arrowSwell { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.08); opacity: 1; filter: brightness(1.3) drop-shadow(0 0 15px var(--accent-glow)); } }
+
   .interaction-hint {
     position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
     background: var(--ink); border: 1px solid var(--ink); color: var(--bg);
@@ -159,11 +163,6 @@
   }
   .light-theme .mode-hint { background: #000; color: #fff; border-color: #000; }
 
-  @keyframes bounceRotate { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
-  @keyframes bounceHint { 0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.8; } 50% { transform: translateX(-50%) translateY(-10px); opacity: 1; } }
-
-  /* Pulsating Arrow Animation */
-  @keyframes arrowSwell { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.08); opacity: 1; filter: brightness(1.3) drop-shadow(0 0 15px var(--accent-glow)); } }
   .arrow-group.pulsating .arrow-path { animation: arrowSwell 1.5s infinite ease-in-out; transform-origin: center; transform-box: fill-box; }
 
   .ring { cursor: grab; touch-action: none; pointer-events: all; }
@@ -209,15 +208,15 @@
   .legend-item { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; opacity: 0.8; }
   .roman-badge { width: 22px; height: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 1.5px solid var(--accent); color: var(--accent); font-weight: 800; font-size: 9px; }
 
-  /* PORTRAIT MOBILE: Compact and No-Scroll */
+  /* PORTRAIT MOBILE: Optimized and No-Scroll */
   @media (max-width: 1120px) and (orientation: portrait) {
     body { overflow: hidden; height: 100vh; }
     .app-layout { flex-direction: column; }
     .ad-slot { display: none; }
     .main-content { 
       flex-direction: column; 
-      padding: 10px; 
-      gap: 10px; 
+      padding: 8px; 
+      gap: 8px; 
       justify-content: flex-start;
       height: 100%;
     }
@@ -226,16 +225,31 @@
       max-width: none;
       padding: 10px 15px;
       border-radius: 15px;
-      box-shadow: none;
-      background: rgba(17, 24, 39, 0.6);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      background: var(--card-bg) !important;
       margin: 0;
     }
-    .sidebar { order: 1; }
-    .compass-area { order: 2; flex-grow: 1; height: auto; padding: 0; margin: -10px 0; }
-    .info-panel { order: 3; margin-top: auto; padding-top: 5px; }
+    .sidebar { order: 1; position: relative; }
+    .compass-area { order: 2; flex-grow: 1; height: auto; padding: 0; margin: -5px 0; }
+    .info-panel { order: 3; margin-top: auto; }
     
-    .logo-container { margin-bottom: 5px; padding-bottom: 5px; justify-content: center; }
-    .logo-text { font-size: 13px; }
+    .logo-container { 
+      margin-bottom: 5px; 
+      padding-bottom: 5px; 
+      justify-content: space-between; 
+      border-bottom: 1px solid var(--dim);
+    }
+    .logo-text { font-size: 13px; flex-grow: 1; text-align: left; }
+    
+    .controls-top-right { 
+      position: static; 
+      display: flex; 
+      gap: 6px; 
+      transform: none;
+    }
+    .utility-btn { width: 32px; height: 32px; border-radius: 8px; }
+    #exportPngBtn { display: none; } /* Camera button hidden on mobile */
+
     .legend-list {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -244,19 +258,13 @@
     .legend-item { font-size: 10px; gap: 4px; }
     .roman-badge { width: 18px; height: 18px; font-size: 8px; }
     
-    .compass-wrap { width: 78vmin; }
+    .compass-wrap { width: 75vmin; }
     .info-title { padding-bottom: 4px; margin-bottom: 5px; font-size: 12px; }
-    .staff-container { height: 90px; margin-top: 2px; }
+    .staff-container { height: 85px; margin-top: 2px; display: block !important; visibility: visible !important; }
     .spelling-note { display: none; }
-    
-    .controls-top-right { 
-      position: fixed; top: 10px; right: 10px; gap: 8px;
-      background: var(--bg); border-radius: 10px; padding: 3px; 
-    }
-    .utility-btn { width: 36px; height: 36px; }
   }
 
-  /* LANDSCAPE (TABLET/MOBILE): Circle middle, Panels left/right */
+  /* LANDSCAPE SMALL SCREEN */
   @media (max-height: 650px) and (orientation: landscape) {
     .main-content { gap: 10px; flex-direction: row; }
     .sidebar, .info-panel { width: 210px; padding: 12px; }
@@ -329,23 +337,22 @@
     <div class="interaction-hint" id="interactionHint"><span>&larr;</span> Drag to rotate! <span>&rarr;</span></div>
     <div class="mode-hint" id="modeHint">Select a mode</div>
 
-    <div class="controls-top-right">
-      <button class="utility-btn" id="infoBtn" title="Instructions">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      </button>
-      <button class="utility-btn" id="themeToggleBtn" title="Wissel Thema">
-        <svg id="themeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
-      <button class="utility-btn" id="exportPngBtn" title="Exporteer PNG">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      </button>
-    </div>
-
     <aside class="sidebar">
       <div class="logo-container">
         <div class="logo-text">Modal Compass Pro</div>
+        <div class="controls-top-right">
+          <button class="utility-btn" id="infoBtn" title="Instructions">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </button>
+          <button class="utility-btn" id="themeToggleBtn" title="Wissel Thema">
+            <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+          <button class="utility-btn" id="exportPngBtn" title="Exporteer PNG">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </button>
+        </div>
       </div>
       <ul class="legend-list">
           <li class="legend-item"><span class="roman-badge">I</span> Ionian</li>
@@ -598,7 +605,6 @@
     }
     document.querySelectorAll('.arrow-group').forEach((g, i) => {
         g.classList.toggle('selected', i === state.selectedModeIdx);
-        // Flashende pijl animatie (Onboarding hersteld)
         g.classList.toggle('pulsating', !state.hasSelectedMode && i === 0);
     });
   }
