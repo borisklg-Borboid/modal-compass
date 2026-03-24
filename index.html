@@ -56,7 +56,7 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     height: 100vh;
     width: 100vw;
-    overflow: hidden; /* NO SCROLLING */
+    overflow: hidden; 
     display: flex;
     flex-direction: column;
     user-select: none;
@@ -73,7 +73,6 @@
     overflow: hidden;
   }
 
-  /* Ad Slots as part of the flexbox */
   .ad-slot {
     width: var(--ad-width);
     height: 100%;
@@ -88,16 +87,16 @@
     border-right: 1px solid rgba(255, 255, 255, 0.05);
   }
 
-  /* Centered Main Content */
   .main-content {
     flex-grow: 1;
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
     padding: 10px;
     gap: 15px;
     overflow: hidden;
+    position: relative;
   }
 
   .sidebar, .info-panel {
@@ -112,7 +111,6 @@
     padding: 20px;
     z-index: 20;
     transition: all var(--transition);
-    overflow-y: auto; /* Allow internal scrolling if content is too tall for tiny screens */
   }
 
   .info-panel { opacity: 0; pointer-events: none; transform: translateX(20px); }
@@ -131,12 +129,35 @@
   }
 
   .compass-wrap {
-    width: min(85vmin, 760px); /* Smart scaling based on shortest screen dimension */
+    width: min(82vmin, 720px);
     aspect-ratio: 1;
     position: relative;
     filter: drop-shadow(0 30px 60px rgba(0,0,0,0.6));
     transition: filter var(--transition);
   }
+
+  /* Interaction Hints (Onboarding) */
+  .interaction-hint {
+    position: absolute; top: 5%; left: 50%; transform: translateX(-50%);
+    background: var(--ink); border: 1px solid var(--ink); color: var(--bg);
+    padding: 8px 18px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 12px;
+    pointer-events: none; z-index: 15; opacity: 1; transition: 0.6s ease; font-size: 11px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: bounceRotate 3s infinite ease-in-out;
+  }
+  .light-theme .interaction-hint { background: #000; color: #fff; border-color: #000; }
+  
+  .mode-hint {
+    position: absolute; top: 15%; left: 50%; transform: translateX(-50%);
+    background: var(--ink); border: 1px solid var(--ink); color: var(--bg);
+    padding: 8px 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    pointer-events: none; z-index: 14; opacity: 1; transition: 0.6s ease;
+    animation: bounceHint 2s infinite ease-in-out; font-size: 11px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  }
+  .light-theme .mode-hint { background: #000; color: #fff; border-color: #000; }
+
+  @keyframes bounceRotate { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
+  @keyframes bounceHint { 0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.8; } 50% { transform: translateX(-50%) translateY(-10px); opacity: 1; } }
 
   /* Utility Styles */
   .ring { cursor: grab; touch-action: none; pointer-events: all; }
@@ -159,7 +180,7 @@
 
   /* Header Controls */
   .controls-top-right {
-    position: absolute; top: 20px; right: 20px;
+    position: absolute; top: 15px; right: 15px;
     display: flex; gap: 10px; z-index: 100;
   }
   .utility-btn {
@@ -170,7 +191,7 @@
   .light-theme .utility-btn { background: #fff; border-color: #000; color: #000; }
   .utility-btn:hover { border-color: var(--accent); background: rgba(0, 255, 208, 0.1); transform: translateY(-2px); }
 
-  /* Preserved Component UI */
+  /* Component UI Elements */
   .info-title { font-size: 14px; font-weight: 800; color: var(--accent); text-align: center; border-bottom: 1px solid var(--dim); padding-bottom: 10px; margin-bottom: 10px; text-transform: uppercase; }
   .chord-pill { font-size: 10px; font-weight: 700; padding: 6px 2px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid var(--dim); text-align: center; cursor: pointer; }
   .chord-pill.active { background: var(--accent); color: var(--bg); font-weight: 800; }
@@ -197,6 +218,12 @@
   .arrow-path { fill: url(#arrow-grad); stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; transition: 0.2s; }
   .arrow-group.selected .arrow-path { stroke-width: 5px !important; filter: drop-shadow(0 0 12px var(--accent-glow)); }
 
+  /* Responsive Scaling */
+  @media (max-width: 1400px) {
+    .main-content { gap: 10px; }
+    .sidebar, .info-panel { width: 240px; }
+  }
+
   /* PORTRAIT: Stack vertically */
   @media (max-width: 1120px) and (orientation: portrait) {
     body { overflow-y: auto; overflow-x: hidden; height: auto; }
@@ -209,19 +236,21 @@
     .legend-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 8px; }
     .compass-wrap { width: 90vw; max-width: 450px; margin-top: 20px; }
     .controls-top-right { position: fixed; top: 12px; right: 12px; background: var(--bg); border-radius: 12px; padding: 4px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+    .interaction-hint, .mode-hint { display: none; }
   }
 
-  /* LANDSCAPE TABLET/MOBILE: Keep middle circle */
-  @media (max-height: 600px) and (orientation: landscape) {
-    .main-content { gap: 10px; }
+  /* LANDSCAPE (TABLET/MOBILE): Keep middle circle */
+  @media (max-height: 650px) and (orientation: landscape) {
+    .main-content { gap: 10px; flex-direction: row; }
     .sidebar, .info-panel { width: 220px; padding: 15px; }
-    .compass-wrap { width: 75vmin; }
+    .compass-wrap { width: 80vmin; }
     .staff-container { height: 90px; }
     .logo-container { margin-bottom: 5px; }
+    .controls-top-right { top: 10px; right: 10px; }
   }
 
   /* Export Guard */
-  .is-exporting .ad-slot, .is-exporting .controls-top-right { display: none !important; }
+  .is-exporting .ad-slot, .is-exporting .controls-top-right, .is-exporting .interaction-hint, .is-exporting .mode-hint { display: none !important; }
   .footer-under-compass { margin-top: 15px; font-size: 10px; opacity: 0.5; text-align: center; }
   .footer-under-compass a { color: inherit; }
   svg { width: 100%; height: 100%; overflow: visible; user-select: none; }
@@ -265,6 +294,10 @@
   </div>
 
   <main class="main-content">
+    <!-- Onboarding Hints -->
+    <div class="interaction-hint" id="interactionHint"><span>&larr;</span> Drag to rotate! <span>&rarr;</span></div>
+    <div class="mode-hint" id="modeHint">Select a mode</div>
+
     <div class="controls-top-right">
       <button class="utility-btn" id="infoBtn" title="Instructions">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
@@ -378,13 +411,15 @@
     infoBtn: document.getElementById('infoBtn'),
     modal: document.getElementById('modalOverlay'),
     modalClose: document.getElementById('modalClose'),
-    themeToggle: document.getElementById('themeToggleBtn'),
-    exportBtn: document.getElementById('exportPngBtn'),
+    themeToggleBtn: document.getElementById('themeToggleBtn'),
+    exportPngBtn: document.getElementById('exportPngBtn'),
     bgCircle: document.getElementById('bgCircle'),
-    coreCircle: document.getElementById('coreCircle')
+    coreCircle: document.getElementById('coreCircle'),
+    interactionHint: document.getElementById('interactionHint'),
+    modeHint: document.getElementById('modeHint')
   };
 
-  let state = { angle: 0, isDragging: false, startAngle: 0, startPointer: 0, selectedModeIdx: null, selectedChord: null, spellingPreference: 1, manualOverride: false, startX: 0, startY: 0 };
+  let state = { angle: 0, isDragging: false, startAngle: 0, startPointer: 0, selectedModeIdx: null, selectedChord: null, spellingPreference: 1, manualOverride: false, startX: 0, startY: 0, hasRotated: false, hasSelectedMode: false };
 
   const getPolar = (r, deg) => ({ x: r * Math.cos(deg * DEG2RAD), y: r * Math.sin(deg * DEG2RAD) });
 
@@ -534,7 +569,9 @@
         }
         renderStaff(el.staffContainer, staffNotes, hi);
     }
-    document.querySelectorAll('.arrow-group').forEach((g, i) => g.classList.toggle('selected', i === state.selectedModeIdx));
+    document.querySelectorAll('.arrow-group').forEach((g, i) => {
+        g.classList.toggle('selected', i === state.selectedModeIdx);
+    });
   }
 
   window.toggleChord = (deg, type) => { state.selectedChord = (state.selectedChord?.degree === deg && state.selectedChord?.type === type) ? null : { degree: deg, type }; updateVisuals(); };
@@ -548,7 +585,11 @@
     state.isDragging = true; state.startX = e.clientX; state.startY = e.clientY;
     state.startAngle = state.angle; state.startPointer = getAngle(e); el.ring.setPointerCapture(e.pointerId); 
   };
-  el.ring.onpointermove = (e) => { if (!state.isDragging) return; state.angle = state.startAngle + (getAngle(e) - state.startPointer); updateVisuals(); };
+  el.ring.onpointermove = (e) => { 
+    if (!state.isDragging) return; 
+    let d = getAngle(e) - state.startPointer; if (d > 180) d -= 360; if (d < -180) d += 360; state.angle = state.startAngle + d; 
+    updateVisuals(); if (Math.abs(d) > 3) { state.manualOverride = false; state.hasRotated = true; }
+  };
   el.ring.onpointerup = (e) => { 
     state.isDragging = false; 
     const dist = Math.hypot(e.clientX - state.startX, e.clientY - state.startY);
@@ -559,6 +600,7 @@
             updateVisuals();
         }
     }
+    if (state.hasRotated && el.interactionHint) { el.interactionHint.style.opacity = '0'; setTimeout(() => { if(el.interactionHint) el.interactionHint.remove(); }, 600); }
     state.angle = Math.round(state.angle / STEP) * STEP; updateVisuals(); 
   };
 
@@ -583,14 +625,22 @@
       cTxt.setAttribute('x', pC.x); cTxt.setAttribute('y', pC.y); cTxt.classList.add('chord-text'); cTxt.textContent = chord; g.appendChild(cTxt);
     });
 
-    g.onclick = (e) => { e.stopPropagation(); state.selectedModeIdx = (state.selectedModeIdx === i ? null : i); el.infoPanel.classList.toggle('visible', state.selectedModeIdx !== null); state.selectedChord = null; updateVisuals(); };
+    g.onclick = (e) => { 
+        e.stopPropagation(); state.hasSelectedMode = true;
+        state.selectedModeIdx = (state.selectedModeIdx === i ? null : i); 
+        el.infoPanel.classList.toggle('visible', state.selectedModeIdx !== null); 
+        state.selectedChord = null; 
+        if (el.modeHint) { el.modeHint.style.opacity = '0'; setTimeout(() => { if(el.modeHint) el.modeHint.remove(); }, 600); }
+        updateVisuals(); 
+    };
     el.arrows.appendChild(g);
   });
 
   el.infoBtn.onclick = () => el.modal.style.display = 'flex';
   el.modalClose.onclick = () => el.modal.style.display = 'none';
-  el.themeToggle.onclick = () => { document.body.classList.toggle('light-theme'); updateVisuals(); };
-  el.exportBtn.onclick = async () => {
+  el.themeToggleBtn.onclick = () => { document.body.classList.toggle('light-theme'); updateVisuals(); };
+  
+  el.exportPngBtn.onclick = async () => {
     document.body.classList.add('is-exporting');
     const canvas = await html2canvas(document.getElementById('captureRegion'), { scale: 2 });
     const link = document.createElement('a'); link.download = 'modal-compass.png'; link.href = canvas.toDataURL(); link.click();
