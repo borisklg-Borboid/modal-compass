@@ -64,7 +64,7 @@
     touch-action: none;
   }
 
-  /* Layout Architecture */
+  /* 5-Column Layout Architecture */
   .app-layout {
     display: flex;
     flex-direction: row;
@@ -139,14 +139,13 @@
     touch-action: none;
   }
 
-  /* Note Highlights for Mobile */
+  /* Note Highlights for Mobile - Clean Outline */
   .note-highlight {
     fill: none;
     stroke: var(--accent);
-    stroke-width: 2.5;
+    stroke-width: 3;
     opacity: 0;
     transition: opacity 0.3s ease;
-    filter: drop-shadow(0 0 5px var(--accent-glow));
   }
   .note-highlight.active { opacity: 1; }
 
@@ -172,11 +171,11 @@
 
   @keyframes bounceRotate { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
   @keyframes bounceHint { 0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.8; } 50% { transform: translateX(-50%) translateY(-10px); opacity: 1; } }
-  @keyframes arrowSwell { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; filter: brightness(1.3) drop-shadow(0 0 15px var(--accent-glow)); } }
+  @keyframes arrowSwell { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.08); opacity: 1; filter: brightness(1.3) drop-shadow(0 0 15px var(--accent-glow)); } }
 
   .arrow-group.pulsating .arrow-path { animation: arrowSwell 1.5s infinite ease-in-out; transform-origin: center; transform-box: fill-box; }
 
-  /* Desktop Controls (Default) */
+  /* Desktop Controls */
   .controls-top-right {
     position: absolute; top: 20px; right: 20px;
     display: flex; gap: 10px; z-index: 100;
@@ -190,55 +189,62 @@
   .utility-btn:hover { border-color: var(--accent); background: rgba(0, 255, 208, 0.1); transform: translateY(-2px); }
 
   /* UI Elements */
-  .info-title { font-size: 14px; font-weight: 800; color: var(--accent); text-align: center; border-bottom: 1px solid var(--dim); padding-bottom: 8px; margin-bottom: 8px; text-transform: uppercase; }
+  .info-title { font-size: 14px; font-weight: 800; color: var(--accent); text-align: center; border-bottom: 1px solid var(--dim); padding-bottom: 6px; margin-bottom: 6px; text-transform: uppercase; }
   .chord-pill { font-size: 10px; font-weight: 700; padding: 6px 2px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid var(--dim); text-align: center; cursor: pointer; }
   .chord-pill.active { background: var(--accent); color: var(--bg); font-weight: 800; }
   .chord-row-content { display: grid; grid-template-columns: 1fr 1.1fr 1.1fr; gap: 4px; margin-bottom: 4px; }
   .staff-container { width: 100%; height: 120px; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); }
-  .logo-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px; position: relative; }
+  .logo-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 8px; position: relative; }
   .logo-text { font-size: 15px; font-weight: 800; line-height: 1.1; white-space: nowrap; flex-grow: 1; }
   .legend-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
   .legend-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; opacity: 0.8; }
   .roman-badge { width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 1.5px solid var(--accent); color: var(--accent); font-weight: 800; font-size: 9px; }
 
-  /* PORTRAIT MOBILE: Optimized and Compact */
+  /* PORTRAIT MOBILE: Optimized Card Style and No-Scroll */
   @media (max-width: 1120px) and (orientation: portrait) {
     body { overflow: hidden; height: 100vh; }
     .app-layout { flex-direction: column; }
     .ad-slot { display: none; }
-    .main-content { flex-direction: column; padding: 8px; gap: 8px; justify-content: flex-start; height: 100%; }
-    
-    /* Small Buttons into Sidebar Header */
-    .controls-top-right {
-      position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-      gap: 6px;
+    .main-content { 
+      flex-direction: column; 
+      padding: 6px; 
+      gap: 6px; 
+      justify-content: flex-start;
+      height: 100%;
     }
-    .utility-btn { width: 32px; height: 32px; border-radius: 8px; }
-    .utility-btn svg { width: 16px; height: 16px; }
-    #exportPngBtn { display: none; } /* Camera removed on mobile */
-
+    
     .sidebar, .info-panel {
-      width: 100%; max-width: none; padding: 10px 15px;
-      border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      width: 100%; max-width: none; padding: 8px 12px;
+      border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.12);
       background: var(--card-bg) !important;
       margin: 0;
     }
-    .light-theme .sidebar, .light-theme .info-panel { background: #ffffff !important; box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
+    .light-theme .sidebar, .light-theme .info-panel { background: #ffffff !important; }
     
     .sidebar { order: 1; }
-    .compass-area { order: 2; flex-grow: 1; margin: -5px 0; }
+    .compass-area { order: 2; flex-grow: 1; margin: -2px 0; height: auto; }
     .info-panel { order: 3; margin-top: auto; }
     
-    .logo-container { margin-bottom: 6px; padding-bottom: 4px; }
+    .controls-top-right {
+      position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+      gap: 4px;
+    }
+    .utility-btn { width: 30px; height: 30px; border-radius: 6px; }
+    .utility-btn svg { width: 14px; height: 14px; }
+    #exportPngBtn { display: none; } 
+
+    .logo-container { margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid var(--dim); }
     .logo-text { font-size: 13px; }
-    .legend-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .legend-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
     .legend-item { font-size: 10px; gap: 4px; }
     .roman-badge { width: 18px; height: 18px; font-size: 8px; }
     
     .compass-wrap { width: 72vmin; }
-    .info-title { padding-bottom: 4px; margin-bottom: 4px; font-size: 12px; }
-    
-    /* Staff hidden on mobile, replaced by Highlights logic */
+    .info-title { padding-bottom: 2px; margin-bottom: 4px; font-size: 11px; }
+    .chord-row-content { gap: 3px; margin-bottom: 3px; }
+    .chord-pill { font-size: 9px; padding: 4px 2px; }
+
+    /* Highlights replace Staff */
     .staff-container, .staff-label { display: none !important; }
     .spelling-note { display: none; }
     .interaction-hint, .mode-hint { display: none; }
@@ -254,21 +260,7 @@
     .controls-top-right { top: 10px; right: 10px; }
   }
 
-  /* Modal System */
-  .modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
-    z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px;
-  }
-  .modal-content {
-    background: var(--card-bg); color: var(--ink); max-width: 650px; width: 100%;
-    max-height: 85vh; overflow-y: auto; border-radius: 24px; border: 1px solid var(--accent);
-    padding: 40px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  }
-  .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--accent); font-size: 28px; cursor: pointer; }
-  .modal-content h2 { color: var(--accent); margin-top: 0; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
-
-  /* SVG Note styling */
+  /* Note Labels */
   .note-label { font-size: 19px; font-weight: 700; fill: var(--ink); transition: 0.4s; pointer-events: none; }
   .note-label.active { fill: var(--accent); filter: drop-shadow(0 0 10px var(--accent-glow)); font-size: 24px; opacity: 1; }
   .note-label.dim { opacity: 0.12; }
@@ -292,7 +284,6 @@
 </head>
 <body class="light-theme">
 
-<!-- Instructions Modal -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-content">
     <button class="modal-close" id="modalClose">&times;</button>
@@ -301,7 +292,7 @@
     <h3>How to use</h3>
     <p>1. <strong>Rotate</strong> the outer ring to set the key.<br>
        2. <strong>Click</strong> a Roman Numeral to choose a mode.<br>
-       3. <strong>Select</strong> a chord to visualize it on the musical staff.<br>
+       3. <strong>Select</strong> a chord to visualize its structure.<br>
        4. <strong>Toggle</strong> Dark/Light mode for best visibility.</p>
     <p><em>Empowering musicians with visual theoretical insights.</em></p>
   </div>
@@ -539,7 +530,6 @@
     const activeMap = {}; 
     SCALE_STEPS.forEach((s, deg) => activeMap[(root.pitch + s) % 12] = spellNote((root.pitch + s) % 12, root, deg));
     
-    // Highlight logic for Mobile
     const isMobile = window.innerWidth <= 1120 && window.innerHeight > window.innerWidth;
     let hiIndices = new Set();
     const currentIndices = state.selectedModeIdx !== null ? [...MODES.keys()].slice(state.selectedModeIdx).concat([...MODES.keys()].slice(0, state.selectedModeIdx)) : [];
@@ -559,8 +549,6 @@
       n.el.setAttribute('transform', `rotate(${-state.angle}, ${x}, ${y})`);
       const active = activeMap[n.index] !== undefined;
       n.el.classList.remove('active', 'dim');
-      
-      // Update highlights for mobile
       highlightNodes[n.index].el.classList.toggle('active', isMobile && hiIndices.has(n.index));
 
       if (n.duo) {
@@ -613,11 +601,11 @@
         g.classList.toggle('pulsating', !state.hasSelectedMode && i === 0);
     });
 
-    // Mobile specific button placement handler
     if (isMobile) {
       if (el.controls.parentElement !== el.logoHeader) el.logoHeader.appendChild(el.controls);
     } else {
-      if (el.controls.parentElement !== document.querySelector('.main-content')) document.querySelector('.main-content').appendChild(el.controls);
+      const target = document.querySelector('.main-content');
+      if (el.controls.parentElement !== target) target.appendChild(el.controls);
     }
   }
 
