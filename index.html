@@ -95,7 +95,7 @@
     justify-content: center;
     align-items: center;
     padding: 10px;
-    gap: 20px;
+    gap: 15px;
     overflow: hidden;
     position: relative;
   }
@@ -139,17 +139,11 @@
     touch-action: none;
   }
 
-  /* Note Highlights for Mobile - Clean Outline */
-  .note-highlight {
-    fill: none;
-    stroke: var(--accent);
-    stroke-width: 3;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  .note-highlight.active { opacity: 1; }
+  /* Onboarding Animations */
+  @keyframes bounceRotate { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
+  @keyframes bounceHint { 0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.8; } 50% { transform: translateX(-50%) translateY(-10px); opacity: 1; } }
+  @keyframes arrowSwell { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; filter: brightness(1.3) drop-shadow(0 0 15px var(--accent-glow)); } }
 
-  /* Interaction Hints */
   .interaction-hint {
     position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
     background: var(--ink); border: 1px solid var(--ink); color: var(--bg);
@@ -167,11 +161,6 @@
     animation: bounceHint 2s infinite ease-in-out; font-size: 11px; font-weight: 900; text-transform: uppercase;
     letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
   }
-  .light-theme .mode-hint { background: #000; color: #fff; border-color: #000; }
-
-  @keyframes bounceRotate { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
-  @keyframes bounceHint { 0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.8; } 50% { transform: translateX(-50%) translateY(-10px); opacity: 1; } }
-  @keyframes arrowSwell { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.08); opacity: 1; filter: brightness(1.3) drop-shadow(0 0 15px var(--accent-glow)); } }
 
   .arrow-group.pulsating .arrow-path { animation: arrowSwell 1.5s infinite ease-in-out; transform-origin: center; transform-box: fill-box; }
 
@@ -194,13 +183,13 @@
   .chord-pill.active { background: var(--accent); color: var(--bg); font-weight: 800; }
   .chord-row-content { display: grid; grid-template-columns: 1fr 1.1fr 1.1fr; gap: 4px; margin-bottom: 4px; }
   .staff-container { width: 100%; height: 120px; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); }
-  .logo-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 8px; position: relative; }
+  .logo-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px; position: relative; }
   .logo-text { font-size: 15px; font-weight: 800; line-height: 1.1; white-space: nowrap; flex-grow: 1; }
   .legend-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
   .legend-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; opacity: 0.8; }
   .roman-badge { width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 1.5px solid var(--accent); color: var(--accent); font-weight: 800; font-size: 9px; }
 
-  /* PORTRAIT MOBILE: Optimized Card Style and No-Scroll */
+  /* PORTRAIT MOBILE: Optimized for max screen usage */
   @media (max-width: 1120px) and (orientation: portrait) {
     body { overflow: hidden; height: 100vh; }
     .app-layout { flex-direction: column; }
@@ -215,37 +204,39 @@
     
     .sidebar, .info-panel {
       width: 100%; max-width: none; padding: 8px 12px;
-      border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
       background: var(--card-bg) !important;
       margin: 0;
     }
-    .light-theme .sidebar, .light-theme .info-panel { background: #ffffff !important; }
+    .light-theme .sidebar, .light-theme .info-panel { background: #ffffff !important; box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
     
-    .sidebar { order: 1; }
-    .compass-area { order: 2; flex-grow: 1; margin: -2px 0; height: auto; }
+    .sidebar { order: 1; position: relative; }
+    .compass-area { order: 2; flex-grow: 1; margin: -5px 0; height: auto; justify-content: center; }
     .info-panel { order: 3; margin-top: auto; }
     
     .controls-top-right {
       position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-      gap: 4px;
+      gap: 6px;
     }
     .utility-btn { width: 30px; height: 30px; border-radius: 6px; }
     .utility-btn svg { width: 14px; height: 14px; }
     #exportPngBtn { display: none; } 
 
-    .logo-container { margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid var(--dim); }
+    .logo-container { margin-bottom: 2px; padding-bottom: 2px; border-bottom: 1px solid var(--dim); }
     .logo-text { font-size: 13px; }
     .legend-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
     .legend-item { font-size: 10px; gap: 4px; }
     .roman-badge { width: 18px; height: 18px; font-size: 8px; }
     
-    .compass-wrap { width: 72vmin; }
-    .info-title { padding-bottom: 2px; margin-bottom: 4px; font-size: 11px; }
-    .chord-row-content { gap: 3px; margin-bottom: 3px; }
-    .chord-pill { font-size: 9px; padding: 4px 2px; }
+    .compass-wrap { width: 92vw; max-width: none; }
+    .info-title { padding-bottom: 2px; margin-bottom: 2px; font-size: 11px; }
+    .chord-row-content { gap: 3px; margin-bottom: 2px; }
+    .chord-pill { font-size: 9px; padding: 3px 1px; }
 
-    /* Highlights replace Staff */
+    /* Highlights scale notes instead of staff */
     .staff-container, .staff-label { display: none !important; }
+    .footer-under-compass { display: none; }
+    .mobile-footer { display: block; font-size: 8px; opacity: 0.4; text-align: center; margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--dim); }
     .spelling-note { display: none; }
     .interaction-hint, .mode-hint { display: none; }
   }
@@ -254,17 +245,18 @@
   @media (max-height: 650px) and (orientation: landscape) {
     .main-content { gap: 10px; flex-direction: row; }
     .sidebar, .info-panel { width: 220px; padding: 12px; }
-    .compass-wrap { width: 82vmin; }
-    .staff-container { height: 90px; }
+    .compass-wrap { width: 85vmin; }
+    .staff-container { height: 80px; }
     .logo-container { margin-bottom: 5px; }
     .controls-top-right { top: 10px; right: 10px; }
   }
 
-  /* Note Labels */
+  /* Note Labels and Scale Feedback */
   .note-label { font-size: 19px; font-weight: 700; fill: var(--ink); transition: 0.4s; pointer-events: none; }
   .note-label.active { fill: var(--accent); filter: drop-shadow(0 0 10px var(--accent-glow)); font-size: 24px; opacity: 1; }
+  .note-label.chord-active { font-size: 38px !important; font-weight: 900 !important; } /* Double size for chord notes */
   .note-label.dim { opacity: 0.12; }
-  .note-part { transition: fill 0.3s; pointer-events: all; cursor: pointer; }
+  .note-part { transition: all 0.3s ease; pointer-events: all; cursor: pointer; }
   .note-part.active { fill: var(--accent); opacity: 1; }
   .note-part.dim { opacity: 0.35; }
   .separator { opacity: 0.3; fill: var(--ink); }
@@ -277,26 +269,27 @@
 
   .is-exporting .ad-slot, .is-exporting .controls-top-right, .is-exporting .interaction-hint, .is-exporting .mode-hint { display: none !important; }
   .footer-under-compass { margin-top: 15px; font-size: 10px; opacity: 0.5; text-align: center; }
+  .mobile-footer { display: none; }
   svg { width: 100%; height: 100%; overflow: visible; user-select: none; }
   .ring { cursor: grab; touch-action: none; pointer-events: all; }
   .ring:active { cursor: grabbing; }
+
+  /* Modal System - Optimized and Isolated */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+    z-index: 999; display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-content {
+    background: var(--card-bg); color: var(--ink); max-width: 650px; width: 100%;
+    max-height: 85vh; overflow-y: auto; border-radius: 24px; border: 1px solid var(--accent);
+    padding: 40px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .light-theme .modal-content { background: #ffffff; color: #000000; }
+  .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--accent); font-size: 28px; cursor: pointer; }
 </style>
 </head>
 <body class="light-theme">
-
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal-content">
-    <button class="modal-close" id="modalClose">&times;</button>
-    <h2>About Modal Compass Pro</h2>
-    <p><strong>Modal Compass Pro</strong> is a professional interactive educational tool designed for <strong>music teachers, music students, and theoretical enthusiasts</strong>. It visualizes the deep relationships between church modes and diatonic harmony.</p>
-    <h3>How to use</h3>
-    <p>1. <strong>Rotate</strong> the outer ring to set the key.<br>
-       2. <strong>Click</strong> a Roman Numeral to choose a mode.<br>
-       3. <strong>Select</strong> a chord to visualize its structure.<br>
-       4. <strong>Toggle</strong> Dark/Light mode for best visibility.</p>
-    <p><em>Empowering musicians with visual theoretical insights.</em></p>
-  </div>
-</div>
 
 <div class="app-layout" id="captureRegion">
   
@@ -306,6 +299,7 @@
   </div>
 
   <main class="main-content">
+    <!-- Onboarding Hints -->
     <div class="interaction-hint" id="interactionHint"><span>&larr;</span> Drag to rotate! <span>&rarr;</span></div>
     <div class="mode-hint" id="modeHint">Select a mode</div>
 
@@ -354,7 +348,6 @@
           <g id="uiRing" class="ring" pointer-events="all">
             <circle r="265" fill="var(--ring-bg)" stroke="rgba(255,255,255,0.05)" stroke-width="2" class="ring-circle"/>
             <g id="ticksContainer"></g>
-            <g id="highlightContainer"></g>
             <g id="notesContainer"></g>
           </g>
           <g id="innerCore">
@@ -370,12 +363,28 @@
         <h3 class="info-title" id="infoTitle">Harmony</h3>
         <div class="chord-list" id="chordList"></div>
         <div class="staff-container" id="staffContainer"></div>
+        <div class="mobile-footer">Copyright &copy; 2012 Boris Klein Geltink | <a href="https://forms.gle/EeBv7sm9GpMNSeYE7" target="_blank">Contact Form</a></div>
     </aside>
   </main>
 
   <div class="ad-slot ad-right">
     <div class="ad-placeholder-label">Advertisement</div>
     <div class="ad-container"></div>
+  </div>
+</div>
+
+<!-- Modal remains outside app flow to prevent layout issues -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-content">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <h2>About Modal Compass Pro</h2>
+    <p><strong>Modal Compass Pro</strong> is a professional interactive educational tool designed for <strong>music teachers, music students, and theoretical enthusiasts</strong>. It visualizes the deep relationships between church modes and diatonic harmony.</p>
+    <h3>How to use</h3>
+    <p>1. <strong>Rotate</strong> the outer ring to set the key.<br>
+       2. <strong>Click</strong> a Roman Numeral to choose a mode.<br>
+       3. <strong>Select</strong> a chord to visualize its structure directly in the circle.<br>
+       4. <strong>Toggle</strong> Dark/Light mode for best visibility.</p>
+    <p><em>Empowering musicians with visual theoretical insights.</em></p>
   </div>
 </div>
 
@@ -411,7 +420,6 @@
     svg: document.getElementById('masterSvg'),
     ring: document.getElementById('uiRing'),
     ticks: document.getElementById('ticksContainer'),
-    highlights: document.getElementById('highlightContainer'),
     notes: document.getElementById('notesContainer'),
     arrows: document.getElementById('arrowsContainer'),
     infoPanel: document.getElementById('infoPanel'),
@@ -464,13 +472,9 @@
     let ionianPitchAt12 = Math.round(-state.angle / STEP);
     ionianPitchAt12 = ((ionianPitchAt12 % 12) + 12) % 12;
     const getBestForPitch = (p) => {
-        if (!DUO_SPELLINGS[p]) {
-            const letters = [0, -1, 1, -1, 2, 3, -1, 4, -1, 5, -1, 6];
-            return { letter: letters[p], pitch: p };
-        }
+        if (!DUO_SPELLINGS[p]) return { letter: [0, -1, 1, -1, 2, 3, -1, 4, -1, 5, -1, 6][p], pitch: p };
         if (state.manualOverride) return DUO_SPELLINGS[p][state.spellingPreference];
-        const c1 = countAccidentals(DUO_SPELLINGS[p][0]), c2 = countAccidentals(DUO_SPELLINGS[p][1]);
-        return c1 <= c2 ? DUO_SPELLINGS[p][0] : DUO_SPELLINGS[p][1];
+        return countAccidentals(DUO_SPELLINGS[p][0]) <= countAccidentals(DUO_SPELLINGS[p][1]) ? DUO_SPELLINGS[p][0] : DUO_SPELLINGS[p][1];
     };
     if (state.selectedModeIdx !== null) {
         const pRoot = (ionianPitchAt12 + SCALE_STEPS[state.selectedModeIdx]) % 12;
@@ -508,14 +512,6 @@
     container.innerHTML = html + `</svg>`;
   }
 
-  const highlightNodes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => {
-    const p = getPolar(CONFIG.noteR, -90 + i * STEP);
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('cx', p.x); circle.setAttribute('cy', p.y); circle.setAttribute('r', 22);
-    circle.classList.add('note-highlight'); el.highlights.appendChild(circle);
-    return { el: circle, index: i };
-  });
-
   const noteNodes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => {
     const p = getPolar(CONFIG.noteR, -90 + i * STEP);
     const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -531,25 +527,26 @@
     SCALE_STEPS.forEach((s, deg) => activeMap[(root.pitch + s) % 12] = spellNote((root.pitch + s) % 12, root, deg));
     
     const isMobile = window.innerWidth <= 1120 && window.innerHeight > window.innerWidth;
-    let hiIndices = new Set();
+    let chordPitches = new Set();
     const currentIndices = state.selectedModeIdx !== null ? [...MODES.keys()].slice(state.selectedModeIdx).concat([...MODES.keys()].slice(0, state.selectedModeIdx)) : [];
 
     if (state.selectedChord && currentIndices.length > 0) {
-        const b = state.selectedChord.degree; const t = state.selectedChord.type;
+        const b = state.selectedChord.degree, t = state.selectedChord.type;
         const degs = [b, (b+2)%7, (b+4)%7]; if(t===1) degs.push((b+6)%7);
         if(t===2) {
            const s = MODES[currentIndices[b]].chords[2];
            if(s==='sus4') degs[1]=(b+3)%7; else if(s==='sus2') degs[1]=(b+1)%7; else if(s==='(♭9)') degs.push((b+1)%7); else if(s==='(#11)') degs.push((b+3)%7);
         }
-        degs.forEach(d => hiIndices.add((root.pitch + SCALE_STEPS[currentIndices[d]]) % 12));
+        degs.forEach(d => chordPitches.add((root.pitch + SCALE_STEPS[currentIndices[d]]) % 12));
     }
 
     noteNodes.forEach(n => {
       const x = parseFloat(n.el.getAttribute('x')), y = parseFloat(n.el.getAttribute('y'));
       n.el.setAttribute('transform', `rotate(${-state.angle}, ${x}, ${y})`);
       const active = activeMap[n.index] !== undefined;
-      n.el.classList.remove('active', 'dim');
-      highlightNodes[n.index].el.classList.toggle('active', isMobile && hiIndices.has(n.index));
+      n.el.classList.remove('active', 'dim', 'chord-active');
+      if (active) n.el.classList.add('active'); else n.el.classList.add('dim');
+      if (isMobile && chordPitches.has(n.index)) n.el.classList.add('chord-active');
 
       if (n.duo) {
           n.el.innerHTML = "";
@@ -558,17 +555,15 @@
           const sep = document.createElementNS('http://www.w3.org/2000/svg', 'tspan'); sep.textContent = "/"; sep.classList.add('separator');
           const s2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan'); s2.textContent = p2; s2.classList.add('note-part'); s2.setAttribute('data-pref', '1');
           if (active) {
-             n.el.classList.add('active'); const sp = activeMap[n.index];
+             const sp = activeMap[n.index];
              if (sp.name === p1) { s1.classList.add('active'); s2.classList.add('dim'); } else { s2.classList.add('active'); s1.classList.add('dim'); }
           } else {
-             n.el.classList.add('dim'); 
              const best = (state.manualOverride ? state.spellingPreference : (countAccidentals(DUO_SPELLINGS[n.index][0]) <= countAccidentals(DUO_SPELLINGS[n.index][1]) ? 0 : 1));
              if (best === 0) { s1.classList.add('active'); s2.classList.add('dim'); } else { s2.classList.add('active'); s1.classList.add('dim'); }
           }
           n.el.appendChild(s1); n.el.appendChild(sep); n.el.appendChild(s2);
       } else {
           n.el.textContent = active ? activeMap[n.index].name : ["C", "", "D", "", "E", "F", "", "G", "", "A", "", "B"][n.index];
-          n.el.classList.add(active ? 'active' : 'dim');
       }
     });
 
@@ -576,18 +571,18 @@
         const mode = MODES[state.selectedModeIdx];
         const mRootP = (root.pitch + SCALE_STEPS[state.selectedModeIdx]) % 12;
         el.infoTitle.textContent = `${spellNote(mRootP, root, state.selectedModeIdx).name} ${mode.name.toUpperCase()}`;
-        const staffNotes = [];
         el.chordList.innerHTML = currentIndices.map((oIdx, listIdx) => {
-            const m = MODES[oIdx]; const p = (root.pitch + SCALE_STEPS[oIdx]) % 12; const sp = spellNote(p, root, oIdx); staffNotes.push(sp);
-            const row = m.chords.map((suf, cIdx) => {
+            const p = (root.pitch + SCALE_STEPS[oIdx]) % 12; const sp = spellNote(p, root, oIdx);
+            const row = MODES[oIdx].chords.map((suf, cIdx) => {
                 const active = state.selectedChord?.degree === listIdx && state.selectedChord?.type === cIdx;
                 return `<div class="chord-pill ${active?'active':''}" onclick="window.toggleChord(${listIdx}, ${cIdx})">${sp.name}${suf}</div>`;
             }).join('');
             return `<div class="chord-item"><div class="chord-row-content">${row}</div></div>`;
         }).join('');
-        staffNotes.push(spellNote(mRootP, root, state.selectedModeIdx));
         
         if (!isMobile) {
+            const staffNotes = currentIndices.map(oIdx => spellNote((root.pitch + SCALE_STEPS[oIdx]) % 12, root, oIdx));
+            staffNotes.push(spellNote(mRootP, root, state.selectedModeIdx));
             let staffHi = null;
             if (state.selectedChord) {
                 staffHi = new Set(); const b = state.selectedChord.degree;
@@ -618,3 +613,75 @@
 
   el.ring.onpointerdown = (e) => { 
     state.isDragging = true; state.startX = e.clientX; state.startY = e.clientY;
+    state.startAngle = state.angle; state.startPointer = getAngle(e); el.ring.setPointerCapture(e.pointerId); 
+  };
+  el.ring.onpointermove = (e) => { 
+    if (!state.isDragging) return; 
+    let d = getAngle(e) - state.startPointer; if (d > 180) d -= 360; if (d < -180) d += 360; state.angle = state.startAngle + d; 
+    updateVisuals(); if (Math.abs(d) > 3) { state.manualOverride = false; state.hasRotated = true; }
+  };
+  el.ring.onpointerup = (e) => { 
+    state.isDragging = false; 
+    const dist = Math.hypot(e.clientX - state.startX, e.clientY - state.startY);
+    if (dist < 12) {
+        const hit = document.elementFromPoint(e.clientX, e.clientY);
+        if (hit && hit.classList.contains('note-part')) {
+            state.manualOverride = true; state.spellingPreference = parseInt(hit.getAttribute('data-pref'));
+            updateVisuals();
+        }
+    }
+    if (state.hasRotated && el.interactionHint) { el.interactionHint.style.opacity = '0'; setTimeout(() => { if(el.interactionHint) el.interactionHint.remove(); }, 600); }
+    state.angle = Math.round(state.angle / STEP) * STEP; updateVisuals(); 
+  };
+
+  MODES.forEach((m, i) => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.classList.add('arrow-group');
+    const aC = m.angle, spread = 28;
+    const pts = [getPolar(CONFIG.arrowBase, aC - spread/2), getPolar(CONFIG.arrowNeck, aC - spread/2), getPolar(CONFIG.arrowTip, aC), getPolar(CONFIG.arrowNeck, aC + spread/2), getPolar(CONFIG.arrowBase, aC + spread/2)];
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y} L${pts[3].x},${pts[3].y} L${pts[4].x},${pts[4].y}Z`);
+    p.classList.add('arrow-path'); g.appendChild(p);
+    const pR = getPolar(CONFIG.arrowTip - 24, aC);
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', pR.x); txt.setAttribute('y', pR.y+6); txt.classList.add('roman-text'); txt.textContent = m.roman; g.appendChild(txt);
+    m.chords.forEach((chord, ci) => {
+      let r, aO = 0; if (m.roman === 'VI' && ci < 2) { r = CONFIG.arrowTip - 65; aO = (ci === 0) ? -7.5 : 7.5; } else if (m.roman === 'VI' && ci >= 2) r = CONFIG.arrowTip - 95; else r = CONFIG.arrowTip - 58 - (ci * 21);
+      const pC = getPolar(r, aC + aO);
+      const cTxt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      cTxt.setAttribute('x', pC.x); cTxt.setAttribute('y', pC.y); cTxt.classList.add('chord-text'); cTxt.textContent = chord; g.appendChild(cTxt);
+    });
+    g.onclick = (e) => { 
+        e.stopPropagation(); state.hasSelectedMode = true;
+        state.selectedModeIdx = (state.selectedModeIdx === i ? null : i); 
+        el.infoPanel.classList.toggle('visible', state.selectedModeIdx !== null); 
+        state.selectedChord = null; 
+        if (el.modeHint) { el.modeHint.style.opacity = '0'; setTimeout(() => { if(el.modeHint) el.modeHint.remove(); }, 600); }
+        updateVisuals(); 
+    };
+    el.arrows.appendChild(g);
+  });
+
+  if (el.infoBtn) el.infoBtn.onclick = () => el.modal.style.display = 'flex';
+  if (el.modalClose) el.modalClose.onclick = () => el.modal.style.display = 'none';
+  if (el.themeToggleBtn) el.themeToggleBtn.onclick = () => { document.body.classList.toggle('light-theme'); updateVisuals(); };
+  if (el.exportPngBtn) el.exportPngBtn.onclick = async () => {
+    document.body.classList.add('is-exporting');
+    const canvas = await html2canvas(document.getElementById('captureRegion'), { scale: 2 });
+    const link = document.createElement('a'); link.download = 'modal-compass.png'; link.href = canvas.toDataURL(); link.click();
+    document.body.classList.remove('is-exporting');
+  };
+
+  for (let i = 0; i < 12; i++) {
+    const p = getPolar(CONFIG.tickR, -90 + i * STEP);
+    const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); dot.setAttribute('r', 2.8);
+    dot.classList.add('tick-dot');
+    dot.setAttribute('fill', 'rgba(255,255,255,0.2)'); el.ticks.appendChild(dot);
+  }
+
+  window.addEventListener('resize', updateVisuals);
+  updateVisuals();
+})();
+</script>
+</body>
+</html>
